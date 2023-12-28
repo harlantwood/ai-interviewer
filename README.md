@@ -6,14 +6,16 @@
 
 Work in progress, not ready to try, developing in public, check back later 😎
 
-## Motivation
+## Motivations
 
-To have an AI interview me, to get me to talk about topics I want to share with the world. Also to explore more AI tooling, and hopefully release something useful for others!
+- I want an AI Interviewer, as a way to motivate myself to talk about a variety of topics that I'd like to share with the world. 
+- Experiment with AI in the browser via WASM.
+- Contribute back to open source 
 
 ## Stack / Architecture
 
 - SvelteKit
-- Deploys to Cloudflare Pages (at minimum)
+- Deploy to Cloudflare Pages (at minimum)
 - Audio recording via browser
 - Audio transcription via
   - browser or
