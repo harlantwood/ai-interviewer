@@ -3,11 +3,13 @@
 
 	let startRecording: Function
 	let stopRecording: Function
+	let onProcess: Function
 
 	onMount(async () => {
 		const demo = await import('$lib/whisper/demo')
 		startRecording = demo.startRecording
 		stopRecording = demo.stopRecording
+		onProcess = demo.onProcess
 	})
 
 	// export let data
