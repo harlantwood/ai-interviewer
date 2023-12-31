@@ -1,4 +1,15 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte'
+
+	let startRecording: Function
+	let stopRecording: Function
+
+	onMount(async () => {
+		const demo = await import('$lib/whisper/demo')
+		startRecording = demo.startRecording
+		stopRecording = demo.stopRecording
+	})
+
 	// export let data
 
 	async function askQuestion() {
@@ -26,8 +37,8 @@
 <!-- (user answers, recorded and transribed) -->
 <div id="input_mic">
 	Microphone:
-	<button id="start" on:click={startRecording()}>Start</button>
-	<button id="stop" on:click={stopRecording()} disabled>Stop</button>
+	<button id="start" on:click={() => startRecording()}>Start</button>
+	<button id="stop" on:click={() => stopRecording()} disabled>Stop</button>
 
 	<!-- progress bar to show recording progress -->
 	<br /><br />
@@ -37,7 +48,7 @@
 	</div>
 </div>
 
-<audio controls="controls" id="audio" loop hidden>
+<audio controls="controls" id="audio" loop>
 	Your browser does not support the &lt;audio&gt; tag.
 	<source id="source" src="" type="audio/wav" />
 </audio>
