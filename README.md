@@ -34,11 +34,13 @@ Work in progress, not ready to try, developing in public, check back later 😎
 - [x] Works on cloudflare pages
 - [ ] record user audio via browser
 - [ ] STT user audio
-  - Browser Speech API??
   - Whisper WASM in browser
     - https://github.com/ggerganov/whisper.cpp/tree/master/examples/whisper.wasm
     - demo: https://whisper.ggerganov.com/
   - whisper API
+  - [Browser Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility)?
+    - on chrome is sent to google servers
+    - behind flag on Firefox
 - [ ] try it on cloudflare
 
 ### Stage 2
