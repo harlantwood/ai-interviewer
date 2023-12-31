@@ -7,11 +7,11 @@
 	let stopRecording: Function
 
 	onMount(async () => {
-		const demo = await import('$lib/whisper/demo')
-		loadWhisper = demo.loadWhisper
-		onProcess = demo.onProcess
-		startRecording = demo.startRecording
-		stopRecording = demo.stopRecording
+		const whisper = await import('$lib/whisper/helpers')
+		loadWhisper = whisper.loadWhisper
+		onProcess = whisper.onProcess
+		startRecording = whisper.startRecording
+		stopRecording = whisper.stopRecording
 	})
 
 	// export let data
