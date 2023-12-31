@@ -409,7 +409,7 @@ export function startRecording() {
 // // transcribe
 // //
 
-// var nthreads = 8;
+var nthreads = 8
 
 // export function changeThreads(value) {
 //   nthreads = value;
@@ -445,7 +445,7 @@ export function onProcess(translate) {
 			var ret = window.Module.full_default(
 				instance,
 				audio,
-				document.getElementById('language').value,
+				'en', // document.getElementById('language').value,
 				nthreads,
 				translate
 			)

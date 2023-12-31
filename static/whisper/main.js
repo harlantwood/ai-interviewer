@@ -2847,7 +2847,7 @@ var PThread = {
 	},
 	allocateUnusedWorker() {
 		var worker
-		var pthreadMainJs = locateFile('whisper/libmain.worker.js')
+		var pthreadMainJs = locateFile('libmain.worker.js')
 		worker = new Worker(pthreadMainJs)
 		PThread.unusedWorkers.push(worker)
 	},

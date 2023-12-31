@@ -4,7 +4,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
 let adapter
 if (process.env.SVELTEKIT_ADAPTER === 'cloudflare') {
-  adapter = cloudflareAdapter
+	adapter = cloudflareAdapter
 } else {
 	adapter = autoAdapter
 }
