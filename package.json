@@ -46,7 +46,9 @@
 		"buffer": "^6.0.3",
 		"openai": "^4.24.1"
 	},
+	"packageManager": "yarn@1.22.19",
 	"engines": {
-		"yarn": "^1.22.0"
-	}
+		"yarn": "^1.22.19"
+	},
+	"engineStrict": true
 }
