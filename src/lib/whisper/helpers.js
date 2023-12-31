@@ -7,23 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-import { PUBLIC_MODEL_BASE_URL } from '$env/static/public'
-
-// TODO: convert audio buffer to WAV
-function setAudio(audio) {
-	//if (audio) {
-	//    // convert to 16-bit PCM
-	//    var blob = new Blob([audio], { type: 'audio/wav' });
-	//    var url = URL.createObjectURL(blob);
-	//    document.getElementById('source').src = url;
-	//    document.getElementById('audio').hidden = false;
-	//    document.getElementById('audio').loop = false;
-	//    document.getElementById('audio').load();
-	//} else {
-	//    document.getElementById('audio').hidden = true;
-	//}
-}
-
 // export function changeInput(input) {
 //   if (input == 'file') {
 //     document.getElementById('input_file').style.display = 'block';
@@ -129,22 +112,22 @@ function storeFS(fname, buf) {
 
 export function loadWhisper(model) {
 	let urls = {
-		'tiny.en': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-tiny.en.bin`,
-		tiny: `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-tiny.bin`,
-		'base.en': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-base.en.bin`,
-		base: `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-base.bin`,
-		'small.en': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-small.en.bin`,
-		small: `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-small.bin`,
+		'tiny.en': `/models/whisper/ggml-model-whisper-tiny.en.bin`,
+		tiny: `/models/whisper/ggml-model-whisper-tiny.bin`,
+		'base.en': `/models/whisper/ggml-model-whisper-base.en.bin`,
+		base: `/models/whisper/ggml-model-whisper-base.bin`,
+		'small.en': `/models/whisper/ggml-model-whisper-small.en.bin`,
+		small: `/models/whisper/ggml-model-whisper-small.bin`,
 
-		'tiny-en-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-tiny.en-q5_1.bin`,
-		'tiny-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-tiny-q5_1.bin`,
-		'base-en-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-base.en-q5_1.bin`,
-		'base-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-base-q5_1.bin`,
-		'small-en-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-small.en-q5_1.bin`,
-		'small-q5_1': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-small-q5_1.bin`,
-		'medium-en-q5_0': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-medium.en-q5_0.bin`,
-		'medium-q5_0': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-medium-q5_0.bin`,
-		'large-q5_0': `${PUBLIC_MODEL_BASE_URL}/whisper/ggml-model-whisper-large-q5_0.bin`,
+		'tiny-en-q5_1': `/models/whisper/ggml-model-whisper-tiny.en-q5_1.bin`,
+		'tiny-q5_1': `/models/whisper/ggml-model-whisper-tiny-q5_1.bin`,
+		'base-en-q5_1': `/models/whisper/ggml-model-whisper-base.en-q5_1.bin`,
+		'base-q5_1': `/models/whisper/ggml-model-whisper-base-q5_1.bin`,
+		'small-en-q5_1': `/models/whisper/ggml-model-whisper-small.en-q5_1.bin`,
+		'small-q5_1': `/models/whisper/ggml-model-whisper-small-q5_1.bin`,
+		'medium-en-q5_0': `/models/whisper/ggml-model-whisper-medium.en-q5_0.bin`,
+		'medium-q5_0': `/models/whisper/ggml-model-whisper-medium-q5_0.bin`,
+		'large-q5_0': `/models/whisper/ggml-model-whisper-large-q5_0.bin`,
 	}
 
 	let sizes = {
@@ -292,12 +275,10 @@ const kSampleRate = 16000
 //           printTextarea('js: truncated audio to first ' + kMaxAudio_s + ' seconds');
 //         }
 
-//         setAudio(audio);
 //       });
 //     }, function (e) {
 //       printTextarea('js: error decoding audio: ' + e);
 //       audio = null;
-//       setAudio(audio);
 //     });
 //   }
 //   reader.readAsArrayBuffer(file);
@@ -382,13 +363,11 @@ export function startRecording() {
 									audio = audio.slice(0, kMaxRecording_s * kSampleRate)
 									printTextarea('js: truncated audio to first ' + kMaxRecording_s + ' seconds')
 								}
-								setAudio(audio)
 							})
 						},
 						function (e) {
 							printTextarea('js: error decoding audio: ' + e)
 							audio = null
-							setAudio(audio)
 						}
 					)
 				}
