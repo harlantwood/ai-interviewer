@@ -40,5 +40,8 @@
 		"@supabase/supabase-js": "^2.39.1",
 		"buffer": "^6.0.3",
 		"openai": "^4.24.1"
+	},
+	"engines": {
+		"yarn": "^1.22.0"
 	}
 }
