@@ -8,17 +8,16 @@ Work in progress, not ready to try, developing in public, check back later 😎
 
 ## Motivations
 
-- I want an AI Interviewer, as a way to motivate myself to talk about a variety of topics that I'd like to share with the world. 
+- I want an AI Interviewer, as a way to motivate myself to talk about a variety of topics that I'd like to share with the world.
 - Experiment with AI in the browser via WASM.
-- Contribute back to open source 
+- Contribute back to open source
 
 ## Stack / Architecture
 
-- SvelteKit
+- SvelteKit - fullstack TS front + backend
 - Deploy to Cloudflare Pages (at minimum)
 - Audio recording via browser
 - Audio transcription via
-  - browser or
   - WASM LLM in browser or
   - LLM via API, eg OpenAI
 - Next question generation via:
@@ -28,7 +27,7 @@ Work in progress, not ready to try, developing in public, check back later 😎
 
 ## Features
 
-### Stage 1
+### Stage 1 - Text to Speech (AI) + Speech to Text (User)
 
 - [x] TTS (Text to Speech) via openAI in browser
 - [x] Works on cloudflare pages
@@ -41,30 +40,16 @@ Work in progress, not ready to try, developing in public, check back later 😎
   - [Browser Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility)?
     - on chrome is sent to google servers
     - behind flag on Firefox
-- [ ] try it on cloudflare
 
-### Stage 2
+### Stage 2 - LLM Question Generation
 
 - [ ] feed convo to llm to determine next question
   - prefer: WASM llm - mistral7b or better
     - https://github.com/mlc-ai/web-llm
   - alt: gpt4[-turbo] api
 
-### Stage 3
+### Stage 3 - Audio Archives & Playback
 
 - [ ] save audio (ai and human) to cf r2
 - [ ] stitch together chunks in player to play back interview
 - [ ] download full interview as mp3
-
-sketch
-
-```
-[ Ask me a question ]
-(ai speaks question, also printed out)
-
-(user answers, recorded and transribed)
-(transcription printed out)
-
-[ I'm done ]
-[ Ask me another question ]
-```
