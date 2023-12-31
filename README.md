@@ -45,7 +45,7 @@ Work in progress, not ready to try, developing in public, check back later 😎
 
 - [ ] feed convo to llm to determine next question
   - prefer: WASM llm - mistral7b or better
-    - https://github.com/mlc-ai/web-llm/blob/main/README.md
+    - https://github.com/mlc-ai/web-llm
   - alt: gpt4[-turbo] api
 
 ### Stage 3
