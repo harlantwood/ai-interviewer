@@ -27,15 +27,15 @@ function setAudio(audio) {
 //   }
 // }
 
-// var Module = {
-//   print: printTextarea,
-//   printErr: printTextarea,
-//   setStatus: function (text) {
-//     printTextarea('js: ' + text);
-//   },
-//   monitorRunDependencies: function (left) {
-//   }
-// };
+window.Module =window.Module || {
+  print: printTextarea,
+  printErr: printTextarea,
+  setStatus: function (text) {
+    printTextarea('js: ' + text);
+  },
+  monitorRunDependencies: function (left) {
+  },
+};
 
 // // web audio context
 // var context = null;
@@ -43,8 +43,8 @@ function setAudio(audio) {
 // // audio data
 var audio = null;
 
-// // the whisper instance
-// var instance = null;
+// the whisper instance
+var instance = null;
 // var model_whisper = '';
 
 // // helper function
@@ -66,12 +66,12 @@ var audio = null;
 //   // write to WASM file using FS_createDataFile
 //   // if the file exists, delete it
 //   try {
-//     Module.FS_unlink(fname);
+//     window.Module.FS_unlink(fname);
 //   } catch (e) {
 //     // ignore
 //   }
 
-//   Module.FS_createDataFile("/", fname, buf, true, true);
+//   window.Module.FS_createDataFile("/", fname, buf, true, true);
 
 //   //model_whisper = fname;
 
@@ -401,37 +401,37 @@ export function startRecording() {
 //   document.getElementById('threads-value').innerHTML = nthreads;
 // }
 
-// export function onProcess(translate) {
-//   if (!instance) {
-//     instance = Module.init('whisper.bin');
+export function onProcess(translate) {
+  if (!instance) {
+    instance = window.Module.init('whisper.bin');
 
-//     if (instance) {
-//       printTextarea("js: whisper initialized, instance: " + instance);
-//       document.getElementById('model').innerHTML = 'Model loaded: ' + model_whisper;
-//     }
-//   }
+    if (instance) {
+      printTextarea("js: whisper initialized, instance: " + instance);
+      document.getElementById('model').innerHTML = 'Model loaded: ' + model_whisper;
+    }
+  }
 
-//   if (!instance) {
-//     printTextarea("js: failed to initialize whisper");
-//     return;
-//   }
+  if (!instance) {
+    printTextarea("js: failed to initialize whisper");
+    return;
+  }
 
-//   if (!audio) {
-//     printTextarea("js: no audio data");
-//     return;
-//   }
+  if (!audio) {
+    printTextarea("js: no audio data");
+    return;
+  }
 
-//   if (instance) {
-//     printTextarea('');
-//     printTextarea('js: processing - this might take a while ...');
-//     printTextarea('');
+  if (instance) {
+    printTextarea('');
+    printTextarea('js: processing - this might take a while ...');
+    printTextarea('');
 
-//     setTimeout(function () {
-//       var ret = Module.full_default(instance, audio, document.getElementById('language').value, nthreads, translate);
-//       console.log('js: full_default returned: ' + ret);
-//       if (ret) {
-//         printTextarea("js: whisper returned: " + ret);
-//       }
-//     }, 100);
-//   }
-// }
+    setTimeout(function () {
+      var ret = window.Module.full_default(instance, audio, document.getElementById('language').value, nthreads, translate);
+      console.log('js: full_default returned: ' + ret);
+      if (ret) {
+        printTextarea("js: whisper returned: " + ret);
+      }
+    }, 100);
+  }
+}
