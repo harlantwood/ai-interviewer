@@ -1,5 +1,13 @@
-import adapter from '@sveltejs/adapter-auto'
+import cloudflareAdapter from '@sveltejs/adapter-cloudflare'
+import autoAdapter from '@sveltejs/adapter-auto'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+
+let adapter
+if (process.env.SVELTEKIT_ADAPTER === 'cloudflare') {
+  adapter = cloudflareAdapter
+} else {
+	adapter = autoAdapter
+}
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
