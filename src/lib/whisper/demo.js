@@ -1,4 +1,4 @@
-import {printTextarea} from './helpers'
+import {printTextarea, loadRemote} from './helpers'
 
 // TODO: convert audio buffer to WAV
 function setAudio(audio) {
@@ -15,7 +15,7 @@ function setAudio(audio) {
   //}
 }
 
-// function changeInput(input) {
+// export function changeInput(input) {
 //   if (input == 'file') {
 //     document.getElementById('input_file').style.display = 'block';
 //     document.getElementById('input_mic').style.display = 'none';
@@ -45,10 +45,10 @@ var audio = null;
 
 // the whisper instance
 var instance = null;
-// var model_whisper = '';
+var model_whisper = '';
 
 // // helper function
-// function convertTypedArray(src, type) {
+// export function convertTypedArray(src, type) {
 //   var buffer = new ArrayBuffer(src.byteLength);
 //   var baseView = new src.constructor(buffer).set(src);
 //   return new type(buffer);
@@ -58,31 +58,32 @@ var instance = null;
 // // load model
 // //
 
-// let dbVersion = 1
-// let dbName = 'whisper.ggerganov.com';
-// let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
+window.Whisper = window.Whisper || {}
+window.Whisper.dbName = 'ai-interviewer';
+// const dbVersion = 1
+// const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
 
-// function storeFS(fname, buf) {
-//   // write to WASM file using FS_createDataFile
-//   // if the file exists, delete it
-//   try {
-//     window.Module.FS_unlink(fname);
-//   } catch (e) {
-//     // ignore
-//   }
+ function storeFS(fname, buf) {
+  // write to WASM file using FS_createDataFile
+  // if the file exists, delete it
+  try {
+    window.Module.FS_unlink(fname);
+  } catch (e) {
+    // ignore
+  }
 
-//   window.Module.FS_createDataFile("/", fname, buf, true, true);
+  window.Module.FS_createDataFile("/", fname, buf, true, true);
 
-//   //model_whisper = fname;
+  //model_whisper = fname;
 
-//   document.getElementById('model-whisper-status').innerHTML = 'loaded "' + model_whisper + '"!';
+  document.getElementById('model-whisper-status').innerHTML = 'loaded "' + model_whisper + '"!';
 
-//   printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length);
+  printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length);
 
-//   document.getElementById('model').innerHTML = 'Model fetched: ' + model_whisper;
-// }
+  document.getElementById('model').innerHTML = 'Model fetched: ' + model_whisper;
+}
 
-// function loadFile(event, fname) {
+// export function loadFile(event, fname) {
 //   var file = event.target.files[0] || null;
 //   if (file == null) {
 //     return;
@@ -119,102 +120,102 @@ var instance = null;
 //   document.getElementById('model-whisper-status').innerHTML = 'loaded model: ' + file.name;
 // }
 
-// function loadWhisper(model) {
-//   let urls = {
-//     'tiny.en': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.en.bin',
-//     'tiny': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.bin',
-//     'base.en': 'https://whisper.ggerganov.com/ggml-model-whisper-base.en.bin',
-//     'base': 'https://whisper.ggerganov.com/ggml-model-whisper-base.bin',
-//     'small.en': 'https://whisper.ggerganov.com/ggml-model-whisper-small.en.bin',
-//     'small': 'https://whisper.ggerganov.com/ggml-model-whisper-small.bin',
+export function loadWhisper(model) {
+  let urls = {
+    'tiny.en': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.en.bin',
+    'tiny': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.bin',
+    'base.en': 'https://whisper.ggerganov.com/ggml-model-whisper-base.en.bin',
+    'base': 'https://whisper.ggerganov.com/ggml-model-whisper-base.bin',
+    'small.en': 'https://whisper.ggerganov.com/ggml-model-whisper-small.en.bin',
+    'small': 'https://whisper.ggerganov.com/ggml-model-whisper-small.bin',
 
-//     'tiny-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.en-q5_1.bin',
-//     'tiny-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny-q5_1.bin',
-//     'base-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-base.en-q5_1.bin',
-//     'base-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-base-q5_1.bin',
-//     'small-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-small.en-q5_1.bin',
-//     'small-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-small-q5_1.bin',
-//     'medium-en-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-medium.en-q5_0.bin',
-//     'medium-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-medium-q5_0.bin',
-//     'large-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-large-q5_0.bin',
-//   };
+    'tiny-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny.en-q5_1.bin',
+    'tiny-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-tiny-q5_1.bin',
+    'base-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-base.en-q5_1.bin',
+    'base-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-base-q5_1.bin',
+    'small-en-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-small.en-q5_1.bin',
+    'small-q5_1': 'https://whisper.ggerganov.com/ggml-model-whisper-small-q5_1.bin',
+    'medium-en-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-medium.en-q5_0.bin',
+    'medium-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-medium-q5_0.bin',
+    'large-q5_0': 'https://whisper.ggerganov.com/ggml-model-whisper-large-q5_0.bin',
+  };
 
-//   let sizes = {
-//     'tiny.en': 75,
-//     'tiny': 75,
-//     'base.en': 142,
-//     'base': 142,
-//     'small.en': 466,
-//     'small': 466,
+  let sizes = {
+    'tiny.en': 75,
+    'tiny': 75,
+    'base.en': 142,
+    'base': 142,
+    'small.en': 466,
+    'small': 466,
 
-//     'tiny-en-q5_1': 31,
-//     'tiny-q5_1': 31,
-//     'base-en-q5_1': 57,
-//     'base-q5_1': 57,
-//     'small-en-q5_1': 182,
-//     'small-q5_1': 182,
-//     'medium-en-q5_0': 515,
-//     'medium-q5_0': 515,
-//     'large-q5_0': 1030,
-//   };
+    'tiny-en-q5_1': 31,
+    'tiny-q5_1': 31,
+    'base-en-q5_1': 57,
+    'base-q5_1': 57,
+    'small-en-q5_1': 182,
+    'small-q5_1': 182,
+    'medium-en-q5_0': 515,
+    'medium-q5_0': 515,
+    'large-q5_0': 1030,
+  };
 
-//   let url = urls[model];
-//   let dst = 'whisper.bin';
-//   let size_mb = sizes[model];
+  let url = urls[model];
+  let dst = 'whisper.bin';
+  let size_mb = sizes[model];
 
-//   model_whisper = model;
+  model_whisper = model;
 
-//   document.getElementById('fetch-whisper-tiny-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-tiny').style.display = 'none';
-//   document.getElementById('fetch-whisper-base').style.display = 'none';
-//   document.getElementById('fetch-whisper-small').style.display = 'none';
+  document.getElementById('fetch-whisper-tiny-en').style.display = 'none';
+  document.getElementById('fetch-whisper-base-en').style.display = 'none';
+  document.getElementById('fetch-whisper-small-en').style.display = 'none';
+  document.getElementById('fetch-whisper-tiny').style.display = 'none';
+  document.getElementById('fetch-whisper-base').style.display = 'none';
+  document.getElementById('fetch-whisper-small').style.display = 'none';
 
-//   document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
-//   document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
-//   document.getElementById('fetch-whisper-large-q5_0').style.display = 'none';
+  // document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
+  // document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
+  // document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
+  // document.getElementById('fetch-whisper-large-q5_0').style.display = 'none';
 
-//   document.getElementById('whisper-file').style.display = 'none';
-//   document.getElementById('model-whisper-status').innerHTML = 'loading model: ' + model;
+  // document.getElementById('whisper-file').style.display = 'none';
+  document.getElementById('model-whisper-status').innerHTML = 'loading model: ' + model;
 
-//   cbProgress = function (p) {
-//     let el = document.getElementById('fetch-whisper-progress');
-//     el.innerHTML = Math.round(100 * p) + '%';
-//   };
+  const cbProgress = function (p) {
+    let el = document.getElementById('fetch-whisper-progress');
+    el.innerHTML = Math.round(100 * p) + '%';
+  };
 
-//   cbCancel = function () {
-//     var el;
+  const cbCancel = function () {
+    var el;
 
-//     el = document.getElementById('fetch-whisper-tiny-en'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-base-en'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-small-en'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-tiny'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-base'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-small'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-tiny-en'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-base-en'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-small-en'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-tiny'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-base'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-small'); if (el) el.style.display = 'inline-block';
 
-//     el = document.getElementById('fetch-whisper-tiny-en-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-tiny-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-base-en-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-base-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-small-en-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-small-q5_1'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-medium-en-q5_0'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-medium-q5_0'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('fetch-whisper-large-q5_0'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-tiny-en-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-tiny-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-base-en-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-base-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-small-en-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-small-q5_1'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-medium-en-q5_0'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-medium-q5_0'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('fetch-whisper-large-q5_0'); if (el) el.style.display = 'inline-block';
 
-//     el = document.getElementById('whisper-file'); if (el) el.style.display = 'inline-block';
-//     el = document.getElementById('model-whisper-status'); if (el) el.innerHTML = '';
-//   };
+    el = document.getElementById('whisper-file'); if (el) el.style.display = 'inline-block';
+    el = document.getElementById('model-whisper-status'); if (el) el.innerHTML = '';
+  };
 
-//   loadRemote(url, dst, size_mb, cbProgress, storeFS, cbCancel, printTextarea);
-// }
+  loadRemote(url, dst, size_mb, cbProgress, storeFS, cbCancel, printTextarea);
+}
 
 // //
 // // audio file
@@ -227,7 +228,7 @@ const kSampleRate = 16000;
 // window.AudioContext = window.AudioContext || window.webkitAudioContext;
 // window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
 
-// function loadAudio(event) {
+// export function loadAudio(event) {
 //   if (!context) {
 //     context = new AudioContext({
 //       sampleRate: kSampleRate,
