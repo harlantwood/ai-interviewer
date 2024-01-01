@@ -16,7 +16,7 @@
 // }
 
 const printTextarea = (function () {
-	var element = document.getElementById('output') as HTMLTextAreaElement
+	const element = document.getElementById('output') as HTMLTextAreaElement
 	if (element) element.value = '' // clear browser cache
 	return function (text: string) {
 		if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
@@ -56,9 +56,9 @@ export async function fetchRemote(url: string, cbProgress: Function, cbPrint: Fu
 	const total = parseInt(contentLength, 10)
 	const reader = response.body!.getReader()
 
-	var chunks = []
-	var receivedLength = 0
-	var progressLast = -1
+	const chunks = []
+	let receivedLength = 0
+	let progressLast = -1
 
 	while (true) {
 		const { done, value } = await reader.read()
@@ -73,7 +73,7 @@ export async function fetchRemote(url: string, cbProgress: Function, cbPrint: Fu
 		if (contentLength) {
 			cbProgress(receivedLength / total)
 
-			var progressCur = Math.round((receivedLength / total) * 10)
+			const progressCur = Math.round((receivedLength / total) * 10)
 			if (progressCur != progressLast) {
 				cbPrint('fetchRemote: fetching ' + 10 * progressCur + '% ...')
 				progressLast = progressCur
@@ -81,10 +81,10 @@ export async function fetchRemote(url: string, cbProgress: Function, cbPrint: Fu
 		}
 	}
 
-	var position = 0
-	var chunksAll = new Uint8Array(receivedLength)
+	let position = 0
+	const chunksAll = new Uint8Array(receivedLength)
 
-	for (var chunk of chunks) {
+	for (const chunk of chunks) {
 		chunksAll.set(chunk, position)
 		position += chunk.length
 	}
@@ -115,10 +115,10 @@ function loadRemote(
 	}
 
 	// check if the data is already in the IndexedDB
-	var rq = indexedDB.open(dbName, dbVersion)
+	const rq = indexedDB.open(dbName, dbVersion)
 
 	rq.onupgradeneeded = function (event: IDBVersionChangeEvent) {
-		var db = event.target!.result
+		const db = event.target!.result
 		if (db.version == 1) {
 			var os = db.createObjectStore('models', { autoIncrement: false })
 			cbPrint('loadRemote: created IndexedDB ' + db.name + ' version ' + db.version)
@@ -131,10 +131,10 @@ function loadRemote(
 	}
 
 	rq.onsuccess = function (event) {
-		var db = event.target!.result
-		var tx = db.transaction(['models'], 'readonly')
-		var os = tx.objectStore('models')
-		var rq = os.get(url)
+		const db = event.target!.result
+		const tx = db.transaction(['models'], 'readonly')
+		const os = tx.objectStore('models')
+		const rq = os.get(url)
 
 		rq.onsuccess = function (_event: Event) {
 			if (rq.result) {
@@ -161,11 +161,11 @@ function loadRemote(
 				fetchRemote(url, cbProgress, cbPrint).then(function (data) {
 					if (data) {
 						// store the data in the IndexedDB
-						var rq = indexedDB.open(dbName, dbVersion)
+						const rq = indexedDB.open(dbName, dbVersion)
 						rq.onsuccess = function (event) {
-							var db = event.target!.result
-							var tx = db.transaction(['models'], 'readwrite')
-							var os = tx.objectStore('models')
+							const db = event.target!.result
+							const tx = db.transaction(['models'], 'readwrite')
+							const os = tx.objectStore('models')
 
 							var rq = null
 							try {
@@ -253,8 +253,8 @@ let context: AudioContext | null = null
 let audio: Float32Array | null = null
 
 // the whisper instance
-var instance: unknown = null
-var model_whisper = ''
+let instance: unknown = null
+let model_whisper = ''
 
 // // helper function
 // export function convertTypedArray(src, type) {
@@ -331,7 +331,7 @@ function storeFS(fname: string, buf: Uint8Array) {
 // }
 
 export function loadWhisper(model: string) {
-	let urls = {
+	const urls = {
 		'tiny.en': `/models/whisper/ggml-model-whisper-tiny.en.bin`,
 		tiny: `/models/whisper/ggml-model-whisper-tiny.bin`,
 		'base.en': `/models/whisper/ggml-model-whisper-base.en.bin`,
@@ -350,7 +350,7 @@ export function loadWhisper(model: string) {
 		'large-q5_0': `/models/whisper/ggml-model-whisper-large-q5_0.bin`,
 	}
 
-	let sizes = {
+	const sizes = {
 		'tiny.en': 75,
 		tiny: 75,
 		'base.en': 142,
@@ -369,9 +369,9 @@ export function loadWhisper(model: string) {
 		'large-q5_0': 1030,
 	}
 
-	let url: string = urls[model]
-	let dst = 'whisper.bin'
-	let size_mb: number = sizes[model]
+	const url: string = urls[model]
+	const dst = 'whisper.bin'
+	const size_mb: number = sizes[model]
 
 	model_whisper = model
 
@@ -396,12 +396,12 @@ export function loadWhisper(model: string) {
 	document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
 
 	const cbProgress = function (p: number) {
-		let el = document.getElementById('fetch-whisper-progress')!
+		const el = document.getElementById('fetch-whisper-progress')!
 		el.innerHTML = Math.round(100 * p) + '%'
 	}
 
 	const cbCancel = function () {
-		var el
+		let el
 
 		el = document.getElementById('fetch-whisper-tiny-en')
 		if (el) el.style.display = 'inline-block'
@@ -510,9 +510,9 @@ window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineA
 // microphone
 //
 
-var mediaRecorder: MediaRecorder
+let mediaRecorder: MediaRecorder
 let doRecording = false
-var startTime = 0
+let startTime = 0
 
 export function stopRecording() {
 	doRecording = false
@@ -542,8 +542,8 @@ export function startRecording() {
 	doRecording = true
 	startTime = Date.now()
 
-	var chunks: Blob[] = []
-	var stream: MediaStream
+	let chunks: Blob[] = []
+	let stream: MediaStream
 
 	navigator.mediaDevices
 		.getUserMedia({ audio: true, video: false })
@@ -554,24 +554,24 @@ export function startRecording() {
 				chunks.push(e.data)
 			}
 			mediaRecorder.onstop = function (e) {
-				var blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
+				const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
 				chunks = []
 				;(document.getElementById('start') as HTMLButtonElement).disabled = false
 				;(document.getElementById('stop') as HTMLButtonElement).disabled = true
 
-				var reader = new FileReader()
+				const reader = new FileReader()
 				reader.onload = function (event) {
-					var buf = new Uint8Array(reader.result)
+					const buf = new Uint8Array(reader.result)
 
 					context!.decodeAudioData(
 						buf.buffer,
 						function (audioBuffer) {
-							var offlineContext = new OfflineAudioContext(
+							const offlineContext = new OfflineAudioContext(
 								audioBuffer.numberOfChannels,
 								audioBuffer.length,
 								audioBuffer.sampleRate
 							)
-							var source = offlineContext.createBufferSource()
+							const source = offlineContext.createBufferSource()
 							source.buffer = audioBuffer
 							source.connect(offlineContext.destination)
 							source.start(0)
@@ -631,7 +631,7 @@ export function startRecording() {
 // // transcribe
 // //
 
-var nthreads = 8
+const nthreads = 8
 
 // export function changeThreads(value) {
 //   nthreads = value;
@@ -665,7 +665,7 @@ export function onProcess(translate: boolean) {
 		printTextarea('')
 
 		setTimeout(function () {
-			var ret = window.Module.full_default(
+			const ret = window.Module.full_default(
 				instance,
 				audio,
 				document.getElementById('language')!.value,

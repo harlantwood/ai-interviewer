@@ -1,4 +1,4 @@
-//@ts-expect-error:
+//@ts-expect-error - TS thinks $types does not exist
 import type { PageServerLoad } from '$types'
 
 import { PUBLIC_MODEL_BASE_URL } from '$env/static/public'
