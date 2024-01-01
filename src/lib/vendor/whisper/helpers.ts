@@ -222,9 +222,9 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 //     document.getElementById('input_mic').style.display = 'none';
 //     document.getElementById('progress').style.display = 'none';
 //   } else {
-//     document.getElementById('input_file').style.display = 'none';
-//     document.getElementById('input_mic').style.display = 'block';
-//     document.getElementById('progress').style.display = 'block';
+// document.getElementById('input_file').style.display = 'none'
+document.getElementById('input_mic').style.display = 'block'
+document.getElementById('progress').style.display = 'block'
 //   }
 // }
 
@@ -371,11 +371,11 @@ export function loadWhisper(model) {
 	// document.getElementById('fetch-whisper-base').style.display = 'none'
 	// document.getElementById('fetch-whisper-small').style.display = 'none'
 
-	document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none'
 	// document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
-	document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none'
 	// document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
-	document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none'
 	// document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
 	// document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
 	// document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
@@ -625,7 +625,7 @@ var nthreads = 8
 //   document.getElementById('threads-value').innerHTML = nthreads;
 // }
 
-export function onProcess(translate) {
+export function onProcess(translate: boolean) {
 	if (!instance) {
 		instance = window.Module.init('whisper.bin')
 
@@ -654,7 +654,7 @@ export function onProcess(translate) {
 			var ret = window.Module.full_default(
 				instance,
 				audio,
-				'en', // document.getElementById('language').value,
+				document.getElementById('language').value,
 				nthreads,
 				translate
 			)
