@@ -15,18 +15,18 @@
 //     return new type(buffer);
 // }
 
-const printTextarea = (function () {
-	const element = document.getElementById('output') as HTMLTextAreaElement
-	if (element) element.value = '' // clear browser cache
-	return function (text: string) {
-		if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
-		console.log(text)
-		if (element) {
-			element.value += text + '\n'
-			element.scrollTop = element.scrollHeight // focus on bottom
-		}
-	}
-})()
+// const printTextarea = (function () {
+// 	const element = document.getElementById('output') as HTMLTextAreaElement
+// 	if (element) element.value = '' // clear browser cache
+// 	return function (text: string) {
+// 		if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
+// 		console.log(text)
+// 		if (element) {
+// 			element.value += text + '\n'
+// 			element.scrollTop = element.scrollHeight // focus on bottom
+// 		}
+// 	}
+// })()
 
 // export async function clearCache() {
 //     if (confirm('Are you sure you want to clear the cache?\nAll the models will be downloaded again.')) {
@@ -235,16 +235,6 @@ document.getElementById('input_mic')!.style.display = 'block'
 document.getElementById('progress')!.style.display = 'block'
 //   }
 // }
-
-// @ts-expect-error
-window.Module = window.Module || {
-	print: printTextarea,
-	printErr: printTextarea,
-	setStatus: function (text: string) {
-		printTextarea('js: ' + text)
-	},
-	monitorRunDependencies: function (left) {},
-}
 
 // // web audio context
 let context: AudioContext | null = null
