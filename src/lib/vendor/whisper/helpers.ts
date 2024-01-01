@@ -16,9 +16,9 @@
 // }
 
 const printTextarea = (function () {
-	var element = document.getElementById('output')
+	var element = document.getElementById('output') as HTMLTextAreaElement
 	if (element) element.value = '' // clear browser cache
-	return function (text) {
+	return function (text: string) {
 		if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
 		console.log(text)
 		if (element) {
@@ -36,7 +36,7 @@ const printTextarea = (function () {
 // }
 
 // fetch a remote file from remote URL using the Fetch API
-export async function fetchRemote(url, cbProgress, cbPrint) {
+export async function fetchRemote(url: string, cbProgress: Function, cbPrint: Function) {
 	cbPrint('fetchRemote: downloading with fetch()...')
 
 	const response = await fetch(url, {
@@ -52,9 +52,9 @@ export async function fetchRemote(url, cbProgress, cbPrint) {
 		return
 	}
 
-	const contentLength = response.headers.get('content-length')
+	const contentLength = response.headers.get('content-length')!
 	const total = parseInt(contentLength, 10)
-	const reader = response.body.getReader()
+	const reader = response.body!.getReader()
 
 	var chunks = []
 	var receivedLength = 0
@@ -95,7 +95,15 @@ export async function fetchRemote(url, cbProgress, cbPrint) {
 // load remote data
 // - check if the data is already in the IndexedDB
 // - if not, fetch it from the remote URL and store it in the IndexedDB
-function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
+function loadRemote(
+	url: string,
+	dst: string,
+	size_mb: number,
+	cbProgress: Function,
+	cbReady: Function,
+	cbCancel: Function,
+	cbPrint: Function
+) {
 	if (!navigator.storage || !navigator.storage.estimate) {
 		cbPrint('loadRemote: navigator.storage.estimate() is not supported')
 	} else {
@@ -109,26 +117,26 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 	// check if the data is already in the IndexedDB
 	var rq = indexedDB.open(dbName, dbVersion)
 
-	rq.onupgradeneeded = function (event) {
-		var db = event.target.result
+	rq.onupgradeneeded = function (event: IDBVersionChangeEvent) {
+		var db = event.target!.result
 		if (db.version == 1) {
 			var os = db.createObjectStore('models', { autoIncrement: false })
 			cbPrint('loadRemote: created IndexedDB ' + db.name + ' version ' + db.version)
 		} else {
 			// clear the database
-			var os = event.currentTarget.transaction.objectStore('models')
+			var os = event.currentTarget!.transaction.objectStore('models')
 			os.clear()
 			cbPrint('loadRemote: cleared IndexedDB ' + db.name + ' version ' + db.version)
 		}
 	}
 
 	rq.onsuccess = function (event) {
-		var db = event.target.result
+		var db = event.target!.result
 		var tx = db.transaction(['models'], 'readonly')
 		var os = tx.objectStore('models')
 		var rq = os.get(url)
 
-		rq.onsuccess = function (event) {
+		rq.onsuccess = function (_event: Event) {
 			if (rq.result) {
 				cbPrint('loadRemote: "' + url + '" is already in the IndexedDB')
 				cbReady(dst, rq.result)
@@ -155,7 +163,7 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 						// store the data in the IndexedDB
 						var rq = indexedDB.open(dbName, dbVersion)
 						rq.onsuccess = function (event) {
-							var db = event.target.result
+							var db = event.target!.result
 							var tx = db.transaction(['models'], 'readwrite')
 							var os = tx.objectStore('models')
 
@@ -168,12 +176,12 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 								return
 							}
 
-							rq.onsuccess = function (event) {
+							rq.onsuccess = function (_event: Event) {
 								cbPrint('loadRemote: "' + url + '" stored in the IndexedDB')
 								cbReady(dst, data)
 							}
 
-							rq.onerror = function (event) {
+							rq.onerror = function (_event: Event) {
 								cbPrint('loadRemote: failed to store "' + url + '" in the IndexedDB')
 								cbCancel()
 							}
@@ -183,23 +191,23 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 			}
 		}
 
-		rq.onerror = function (event) {
+		rq.onerror = function (_event: Event) {
 			cbPrint('loadRemote: failed to get data from the IndexedDB')
 			cbCancel()
 		}
 	}
 
-	rq.onerror = function (event) {
+	rq.onerror = function (_event: Event) {
 		cbPrint('loadRemote: failed to open IndexedDB')
 		cbCancel()
 	}
 
-	rq.onblocked = function (event) {
+	rq.onblocked = function (_event: Event) {
 		cbPrint('loadRemote: failed to open IndexedDB: blocked')
 		cbCancel()
 	}
 
-	rq.onabort = function (event) {
+	rq.onabort = function (_event: Event) {
 		cbPrint('loadRemote: failed to open IndexedDB: abort')
 		cbCancel()
 	}
@@ -223,28 +231,29 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 //     document.getElementById('progress').style.display = 'none';
 //   } else {
 // document.getElementById('input_file').style.display = 'none'
-document.getElementById('input_mic').style.display = 'block'
-document.getElementById('progress').style.display = 'block'
+document.getElementById('input_mic')!.style.display = 'block'
+document.getElementById('progress')!.style.display = 'block'
 //   }
 // }
 
+// @ts-expect-error
 window.Module = window.Module || {
 	print: printTextarea,
 	printErr: printTextarea,
-	setStatus: function (text) {
+	setStatus: function (text: string) {
 		printTextarea('js: ' + text)
 	},
 	monitorRunDependencies: function (left) {},
 }
 
 // // web audio context
-// var context = null;
+let context: AudioContext | null = null
 
 // // audio data
-var audio = null
+let audio: Float32Array | null = null
 
 // the whisper instance
-var instance = null
+var instance: unknown = null
 var model_whisper = ''
 
 // // helper function
@@ -262,24 +271,26 @@ const dbVersion = 1
 const dbName = 'ai-interviewer'
 // const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
 
-function storeFS(fname, buf) {
+function storeFS(fname: string, buf: Uint8Array) {
 	// write to WASM file using FS_createDataFile
 	// if the file exists, delete it
 	try {
+		// @ts-expect-error
 		window.Module.FS_unlink(fname)
 	} catch (e) {
 		// ignore
 	}
 
+	// @ts-expect-error
 	window.Module.FS_createDataFile('/', fname, buf, true, true)
 
 	//model_whisper = fname;
 
-	document.getElementById('model-whisper-status').innerHTML = 'loaded "' + model_whisper + '"!'
+	document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
 
 	printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length)
 
-	document.getElementById('model').innerHTML = 'Model fetched: ' + model_whisper
+	document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
 }
 
 // export function loadFile(event, fname) {
@@ -319,7 +330,7 @@ function storeFS(fname, buf) {
 //   document.getElementById('model-whisper-status').innerHTML = 'loaded model: ' + file.name;
 // }
 
-export function loadWhisper(model) {
+export function loadWhisper(model: string) {
 	let urls = {
 		'tiny.en': `/models/whisper/ggml-model-whisper-tiny.en.bin`,
 		tiny: `/models/whisper/ggml-model-whisper-tiny.bin`,
@@ -358,34 +369,34 @@ export function loadWhisper(model) {
 		'large-q5_0': 1030,
 	}
 
-	let url = urls[model]
+	let url: string = urls[model]
 	let dst = 'whisper.bin'
-	let size_mb = sizes[model]
+	let size_mb: number = sizes[model]
 
 	model_whisper = model
 
-	document.getElementById('fetch-whisper-tiny-en').style.display = 'none'
-	document.getElementById('fetch-whisper-base-en').style.display = 'none'
-	// document.getElementById('fetch-whisper-small-en').style.display = 'none'
-	// document.getElementById('fetch-whisper-tiny').style.display = 'none'
-	// document.getElementById('fetch-whisper-base').style.display = 'none'
-	// document.getElementById('fetch-whisper-small').style.display = 'none'
+	document.getElementById('fetch-whisper-tiny-en')!.style.display = 'none'
+	document.getElementById('fetch-whisper-base-en')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-small-en')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-tiny')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-base')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-small')!.style.display = 'none'
 
-	document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none'
-	// document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
-	document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none'
-	// document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
-	document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none'
-	// document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
-	// document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
-	// document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
-	// document.getElementById('fetch-whisper-large-q5_0').style.display = 'none';
+	document.getElementById('fetch-whisper-tiny-en-q5_1')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-tiny-q5_1')!.style.display = 'none';
+	document.getElementById('fetch-whisper-base-en-q5_1')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-base-q5_1')!.style.display = 'none';
+	document.getElementById('fetch-whisper-small-en-q5_1')!.style.display = 'none'
+	// document.getElementById('fetch-whisper-small-q5_1')!.style.display = 'none';
+	// document.getElementById('fetch-whisper-medium-en-q5_0')!.style.display = 'none';
+	// document.getElementById('fetch-whisper-medium-q5_0')!.style.display = 'none';
+	// document.getElementById('fetch-whisper-large-q5_0')!.style.display = 'none';
 
-	// document.getElementById('whisper-file').style.display = 'none';
-	document.getElementById('model-whisper-status').innerHTML = 'loading model: ' + model
+	// document.getElementById('whisper-file')!.style.display = 'none';
+	document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
 
-	const cbProgress = function (p) {
-		let el = document.getElementById('fetch-whisper-progress')
+	const cbProgress = function (p: number) {
+		let el = document.getElementById('fetch-whisper-progress')!
 		el.innerHTML = Math.round(100 * p) + '%'
 	}
 
@@ -441,8 +452,10 @@ export function loadWhisper(model) {
 const kMaxRecording_s = 2 * 60
 const kSampleRate = 16000
 
-// window.AudioContext = window.AudioContext || window.webkitAudioContext;
-// window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+// @ts-expect-error:
+window.AudioContext = window.AudioContext || window.webkitAudioContext
+// @ts-expect-error:
+window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
 
 // export function loadAudio(event) {
 //   if (!context) {
@@ -497,7 +510,7 @@ const kSampleRate = 16000
 // microphone
 //
 
-var mediaRecorder = null
+var mediaRecorder: MediaRecorder
 let doRecording = false
 var startTime = 0
 
@@ -509,27 +522,28 @@ export function stopRecording() {
 // check if doRecording is false every 1000 ms and stop recording if so
 // update progress information
 export function startRecording() {
-	// if (!context) {
-	const context = new AudioContext({
-		sampleRate: kSampleRate,
-		channelCount: 1,
-		echoCancellation: false,
-		autoGainControl: true,
-		noiseSuppression: true,
-	})
-	// }
+	if (!context) {
+		context = new AudioContext({
+			sampleRate: kSampleRate,
+			// rest of options do not seem to exist :(
+			channelCount: 1,
+			echoCancellation: false,
+			autoGainControl: true,
+			noiseSuppression: true,
+		})
+	}
 
-	document.getElementById('start').disabled = true
-	document.getElementById('stop').disabled = false
+	;(document.getElementById('start') as HTMLButtonElement).disabled = true
+	;(document.getElementById('stop') as HTMLButtonElement).disabled = false
 
-	document.getElementById('progress-bar').style.width = '0%'
-	document.getElementById('progress-text').innerHTML = '0%'
+	document.getElementById('progress-bar')!.style.width = '0%'
+	document.getElementById('progress-text')!.innerHTML = '0%'
 
 	doRecording = true
 	startTime = Date.now()
 
-	var chunks = []
-	var stream = null
+	var chunks: Blob[] = []
+	var stream: MediaStream
 
 	navigator.mediaDevices
 		.getUserMedia({ audio: true, video: false })
@@ -542,15 +556,14 @@ export function startRecording() {
 			mediaRecorder.onstop = function (e) {
 				var blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
 				chunks = []
-
-				document.getElementById('start').disabled = false
-				document.getElementById('stop').disabled = true
+				;(document.getElementById('start') as HTMLButtonElement).disabled = false
+				;(document.getElementById('stop') as HTMLButtonElement).disabled = true
 
 				var reader = new FileReader()
 				reader.onload = function (event) {
 					var buf = new Uint8Array(reader.result)
 
-					context.decodeAudioData(
+					context!.decodeAudioData(
 						buf.buffer,
 						function (audioBuffer) {
 							var offlineContext = new OfflineAudioContext(
@@ -598,9 +611,9 @@ export function startRecording() {
 			})
 		}
 
-		document.getElementById('progress-bar').style.width =
+		document.getElementById('progress-bar')!.style.width =
 			(100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
-		document.getElementById('progress-text').innerHTML =
+		document.getElementById('progress-text')!.innerHTML =
 			((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
 	}, 1000)
 
@@ -627,11 +640,12 @@ var nthreads = 8
 
 export function onProcess(translate: boolean) {
 	if (!instance) {
+		// @ts-expect-error:
 		instance = window.Module.init('whisper.bin')
 
 		if (instance) {
 			printTextarea('js: whisper initialized, instance: ' + instance)
-			document.getElementById('model').innerHTML = 'Model loaded: ' + model_whisper
+			document.getElementById('model')!.innerHTML = 'Model loaded: ' + model_whisper
 		}
 	}
 
@@ -654,7 +668,7 @@ export function onProcess(translate: boolean) {
 			var ret = window.Module.full_default(
 				instance,
 				audio,
-				document.getElementById('language').value,
+				document.getElementById('language')!.value,
 				nthreads,
 				translate
 			)
