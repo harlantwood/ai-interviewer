@@ -1,9 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 // Modified from JS in `helpers.js` generated from
-// https://github.com/ggerganov/whisper.cpp/tree/f9ca90256bf691642407e589db1a36562c461db7/examples/whisper.wasm
+// https://github.com/ggerganov/whisper.cpp/tree/9286d3f584240ba58bd44a1bd1e85141579c78d4/examples/whisper.wasm
 // MIT License
 // Copyright (c) 2023 Georgi Gerganov
+//
+// See also /archive/whisper-wasm/README.md in this repo
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -134,19 +136,19 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 				// data is not in the IndexedDB
 				cbPrint('loadRemote: "' + url + '" is not in the IndexedDB')
 
-				// alert and ask the user to confirm
-				if (
-					!confirm(
-						'You are about to download ' +
-							size_mb +
-							' MB of data.\n' +
-							'The model data will be cached in the browser for future use.\n\n' +
-							'Press OK to continue.'
-					)
-				) {
-					cbCancel()
-					return
-				}
+				// // alert and ask the user to confirm
+				// if (
+				// 	!confirm(
+				// 		'You are about to download ' +
+				// 			size_mb +
+				// 			' MB of data.\n' +
+				// 			'The model data will be cached in the browser for future use.\n\n' +
+				// 			'Press OK to continue.'
+				// 	)
+				// ) {
+				// 	cbCancel()
+				// 	return
+				// }
 
 				fetchRemote(url, cbProgress, cbPrint).then(function (data) {
 					if (data) {
@@ -206,9 +208,11 @@ function loadRemote(url, dst, size_mb, cbProgress, cbReady, cbCancel, cbPrint) {
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 // Modified from JS in `index.html` generated from
-// https://github.com/ggerganov/whisper.cpp/tree/f9ca90256bf691642407e589db1a36562c461db7/examples/whisper.wasm
+// https://github.com/ggerganov/whisper.cpp/tree/9286d3f584240ba58bd44a1bd1e85141579c78d4/examples/whisper.wasm
 // MIT License
 // Copyright (c) 2023 Georgi Gerganov
+//
+// See also /archive/whisper-wasm/README.md in this repo
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -362,16 +366,16 @@ export function loadWhisper(model) {
 
 	document.getElementById('fetch-whisper-tiny-en').style.display = 'none'
 	document.getElementById('fetch-whisper-base-en').style.display = 'none'
-	document.getElementById('fetch-whisper-small-en').style.display = 'none'
-	document.getElementById('fetch-whisper-tiny').style.display = 'none'
-	document.getElementById('fetch-whisper-base').style.display = 'none'
-	document.getElementById('fetch-whisper-small').style.display = 'none'
+	// document.getElementById('fetch-whisper-small-en').style.display = 'none'
+	// document.getElementById('fetch-whisper-tiny').style.display = 'none'
+	// document.getElementById('fetch-whisper-base').style.display = 'none'
+	// document.getElementById('fetch-whisper-small').style.display = 'none'
 
-	// document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
 	// document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
-	// document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
 	// document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
-	// document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
+	document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
 	// document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
 	// document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
 	// document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
