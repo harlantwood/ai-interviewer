@@ -31,9 +31,9 @@ Work in progress, not ready to try, developing in public, check back later 😎
 
 - [x] TTS (Text to Speech) via openAI in browser
 - [x] Works on cloudflare pages
-- [ ] record user audio via browser
-- [ ] STT user audio
-  - Whisper WASM in browser
+- [x] record user audio via browser
+- [x] STT user audio
+  - [x] Whisper WASM in browser
     - https://github.com/ggerganov/whisper.cpp/tree/master/examples/whisper.wasm
     - demo: https://whisper.ggerganov.com/
   - whisper API
