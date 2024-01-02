@@ -1,9 +1,9 @@
 <script>
-  export let data
+	export let data;
 </script>
 
 <ul>
-  {#each data.nodes as node}
-    <li>{node.content} [{node.created_at}]</li>
-  {/each}
+	{#each data.nodes as node}
+		<li>{node.content} [{node.created_at}]</li>
+	{/each}
 </ul>
