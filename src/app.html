@@ -10,28 +10,27 @@
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 		<script type="text/javascript">
-			var printTextarea = (function () {
-				var element = document.getElementById('output')
-				if (element) element.value = '' // clear browser cache
-				return function (text) {
-					if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
-					console.log(text)
-					if (element) {
-						element.value += text + '\n'
-						element.scrollTop = element.scrollHeight // focus on bottom
-					}
-				}
-			})()
+			// var printTextarea = (function () {
+			// 	var element = document.getElementById('output')
+			// 	if (element) element.value = '' // clear browser cache
+			// 	return function (text) {
+			// 		if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
+			// 		console.log(text)
+			// 		if (element) {
+			// 			element.value += text + '\n'
+			// 			element.scrollTop = element.scrollHeight // focus on bottom
+			// 		}
+			// 	}
+			// })()
 
-			var Module = {
-				print: printTextarea,
-				printErr: printTextarea,
-				setStatus: function (text) {
-					printTextarea('js: ' + text)
-				},
-				monitorRunDependencies: function (left) {},
-			}
+			// var Module = {
+			// 	print: printTextarea,
+			// 	printErr: printTextarea,
+			// 	setStatus: function (text) {
+			// 		printTextarea('js: ' + text)
+			// 	},
+			// 	monitorRunDependencies: function (left) {},
+			// }
 		</script>
-		<script type="text/javascript" src="/public/whisper/main.js"></script>
 	</body>
 </html>

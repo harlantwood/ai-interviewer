@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment'
 	import { onMount } from 'svelte'
 
 	let loadWhisper: Function
@@ -6,13 +7,59 @@
 	let startRecording: Function
 	let stopRecording: Function
 
+	let whisperOutput: string
+	let transcription: string
+
+	// const handleWhisperOutput = (function () {
+	// var element = document.getElementById('output')
+	// if (element) element.value = '' // clear browser cache
+	function handleWhisperOutput(text) {
+		if (arguments.length > 1) {
+			text = Array.prototype.slice.call(arguments).join(' ')
+		}
+		console.log(text)
+		// if (element) {
+		// 	element.value += text + '\n'
+		// 	element.scrollTop = element.scrollHeight // focus on bottom
+		// }
+	}
+	// })()
+
 	onMount(async () => {
 		const whisper = await import('$lib/vendor/whisper/helpers')
 		loadWhisper = whisper.loadWhisper
 		onProcess = whisper.onProcess
 		startRecording = whisper.startRecording
 		stopRecording = whisper.stopRecording
+
+		window.Module = {
+			print: handleWhisperOutput,
+			printErr: handleWhisperOutput,
+			setStatus: function (text) {
+				handleWhisperOutput('js: ' + text)
+			},
+			monitorRunDependencies: function (left) {},
+		}
 	})
+
+	// $: transcription = parseTranscription(whisperOutput)
+
+	function parseTranscription(output: string) {
+		// find all lines of whisperOutput of similar format to:
+		// [00:00:00.000 --> 00:00:03.000]   Some text
+		// and extract the text to `transcription`:
+
+		const regex = /\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\] (.*)/g
+		let match
+		let transcriptionText = ''
+		while ((match = regex.exec(whisperOutput))) {
+			transcriptionText += match[3] + '\n'
+		}
+		transcriptionText = transcriptionText.trim()
+		console.log({ whisperOutput })
+		console.log({ transcriptionText })
+		return transcriptionText
+	}
 
 	// export let data
 
@@ -130,7 +177,14 @@
 <br />
 
 <!-- textarea with height filling the rest of the page -->
-<textarea id="output" rows="20"></textarea>
+<textarea id="output" bind:value={whisperOutput} rows="20"></textarea>
+
+<button on:click={() => console.log({ whisperOutput })}>show</button>
+<div bind:innerText={transcription} contenteditable></div>
 
 <!-- [ I'm done ] -->
 <!-- [ Ask me another question ] -->
+
+{#if browser}
+	<script type="text/javascript" src="/public/whisper/main.js"></script>
+{/if}
