@@ -8,22 +8,7 @@
 	let stopRecording: Function
 
 	let whisperOutput: string
-	let transcription: string
-
-	// const handleWhisperOutput = (function () {
-	// var element = document.getElementById('output')
-	// if (element) element.value = '' // clear browser cache
-	function handleWhisperOutput(text) {
-		if (arguments.length > 1) {
-			text = Array.prototype.slice.call(arguments).join(' ')
-		}
-		console.log(text)
-		// if (element) {
-		// 	element.value += text + '\n'
-		// 	element.scrollTop = element.scrollHeight // focus on bottom
-		// }
-	}
-	// })()
+	let transcription: string = 'transcription...'
 
 	onMount(async () => {
 		const whisper = await import('$lib/vendor/whisper/helpers')
@@ -42,23 +27,35 @@
 		}
 	})
 
-	// $: transcription = parseTranscription(whisperOutput)
+	function handleWhisperOutput(...args: string[]) {
+		let text
+		if (arguments.length === 1) {
+			text = args[0]
+		} else {
+			text = args.join(' ')
+		}
+		console.log('[whisper] ' + text)
+		const newTranscription = parseTranscription(text)
+		if (newTranscription) {
+			transcription += '\n' + newTranscription
+		}
+	}
 
-	function parseTranscription(output: string) {
-		// find all lines of whisperOutput of similar format to:
+	function parseTranscription(rawOutput: string) {
+		// find all lines of rawOutput of similar format to:
 		// [00:00:00.000 --> 00:00:03.000]   Some text
 		// and extract the text to `transcription`:
 
 		const regex = /\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\] (.*)/g
 		let match
 		let transcriptionText = ''
-		while ((match = regex.exec(whisperOutput))) {
+		while ((match = regex.exec(rawOutput))) {
 			transcriptionText += match[3] + '\n'
 		}
+		transcriptionText = transcriptionText.replace(/\[[A-Z_]+\]/g, '')
+		transcriptionText = transcriptionText.replace(/\s+/g, ' ')
 		transcriptionText = transcriptionText.trim()
-		console.log({ whisperOutput })
-		console.log({ transcriptionText })
-		return transcriptionText
+		return transcriptionText === '' ? null : transcriptionText
 	}
 
 	// export let data
@@ -177,7 +174,7 @@
 <br />
 
 <!-- textarea with height filling the rest of the page -->
-<textarea id="output" bind:value={whisperOutput} rows="20"></textarea>
+<textarea id="output" bind:value={whisperOutput} rows="10"></textarea>
 
 <button on:click={() => console.log({ whisperOutput })}>show</button>
 <div bind:innerText={transcription} contenteditable></div>
