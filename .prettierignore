@@ -1,4 +1,7 @@
 # Ignore files for PNPM, NPM and YARN
-pnpm-lock.yaml
+*.min.js
 package-lock.json
+pnpm-lock.yaml
 yarn.lock
+/archive/
+/static/__public/whisper/

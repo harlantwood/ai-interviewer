@@ -18,7 +18,7 @@
 
 body {
 	min-height: 100vh;
-	margin: 0;
+	margin: 5%;
 	background-attachment: fixed;
 	background-color: var(--color-bg-1);
 	background-size: 100vw 100vh;
@@ -38,6 +38,10 @@ p {
 
 p {
 	line-height: 1.5;
+}
+
+textarea {
+	width: 100%;
 }
 
 a {
