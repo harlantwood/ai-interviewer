@@ -2,6 +2,8 @@
   import { browser } from '$app/environment'
   import { onMount } from 'svelte'
 
+  let webllm: unknown
+
   let loadWhisper: Function
   let onProcess: Function
   let startRecording: Function
@@ -10,7 +12,18 @@
   let whisperOutput: string
   let transcription: string = 'transcription...'
 
+  // const MODEL_LIST = [
+  //   {
+  //     model_url: 'https://huggingface.co/mlc-ai/Mistral-7B-Instruct-v0.2-q4f16_1-MLC/resolve/main/',
+  //     local_id: 'Mistral-7B-Instruct-v0.2-q4f16_1',
+  //     model_lib_url:
+  //       'https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.2/Mistral-7B-Instruct-v0.2-q4f16_1-sw4k_cs1k-webgpu.wasm',
+  //     required_features: ['shader-f16'],
+  //   },
+  // ]
+
   onMount(async () => {
+    webllm = await import('@mlc-ai/web-llm')
     const whisper = await import('$lib/vendor/whisper/helpers')
     loadWhisper = whisper.loadWhisper
     onProcess = whisper.onProcess
@@ -21,12 +34,83 @@
     window.Module = {
       print: handleWhisperOutput,
       printErr: handleWhisperOutput,
-      setStatus: function (text) {
+      setStatus: function (text: string) {
         handleWhisperOutput('js: ' + text)
       },
-      monitorRunDependencies: function (left) {},
+      monitorRunDependencies: function (_arg: unknown) {},
     }
   })
+
+  async function askQuestion() {
+    const question = await getQuestion()
+    await speakQuestion(question)
+  }
+
+  async function getQuestion() {
+    // // webworker:
+    // const chat = new webllm.ChatWorkerClient(
+    //   new Worker('/public/webllm/worker.js', { type: 'module' })
+    // )
+    // main thread:
+    const chat = new webllm.ChatModule()
+
+    chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
+      console.log('init-label', report.text)
+    })
+
+    const appConfig = {
+      model_list: MODEL_LIST,
+    }
+    const chatOpts = {
+      // repetition_penalty: 1.01,
+      system:
+        'you only speak in ryhmes.  you are funny and everthing is a joke.  all your answers start with the letter Z',
+      conv_config: {
+        system:
+          'you only speak in ryhmes.  you are funny and everthing is a joke.  all your answers start with the letter Z',
+      },
+    }
+
+    console.log('reloading model...')
+    // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
+    // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
+    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
+    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1')
+    console.log('done!')
+
+    // const generateProgressCallback = (_step: number, message: string) => {
+    //   console.log('generate-label', message)
+    // }
+
+    const prompt0 = 'what is the meaning of life?'
+    console.log(prompt0)
+    const reply0 = await chat.generate(prompt0) //, generateProgressCallback)
+    console.log(reply0)
+
+    const prompt1 = 'what is your name?'
+    console.log(prompt1)
+    const reply1 = await chat.generate(prompt1) //, generateProgressCallback)
+    console.log(reply1)
+
+    console.log(await chat.runtimeStatsText())
+  }
+
+  async function speakQuestion(question: string) {
+    const res = await fetch('/api/question/audio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: 'what is the meaning of life?',
+        threadHead: 'uuid TODO', // NOTE thread "head" allows for branching convos
+      }),
+    })
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    audio.play()
+  }
 
   function handleWhisperOutput(...args: string[]) {
     let text
@@ -56,25 +140,6 @@
     transcriptionText = transcriptionText.replace(/\s+/g, ' ')
     transcriptionText = transcriptionText.trim()
     return transcriptionText === '' ? null : transcriptionText
-  }
-
-  // export let data
-
-  async function askQuestion() {
-    const res = await fetch('/api/question/audio', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text: 'what is the meaning of life?',
-        threadHead: 'uuid TODO', // NOTE thread "head" allows for branching convos
-      }),
-    })
-    const blob = await res.blob()
-    const url = URL.createObjectURL(blob)
-    const audio = new Audio(url)
-    audio.play()
   }
 </script>
 
