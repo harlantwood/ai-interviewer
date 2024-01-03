@@ -2,7 +2,7 @@
   import { browser } from '$app/environment'
   import { onMount } from 'svelte'
 
-  let webllm: unknown
+  let chat //: ChatModule
 
   let loadWhisper: Function
   let onProcess: Function
@@ -11,6 +11,42 @@
 
   let whisperOutput: string
   let transcription: string = 'transcription...'
+
+  const interviewer = {
+    voice: 'nova',
+    instructions:
+      'You are an AI interviewer, asking me questions. Keep questions short, 1-3 sentences. You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaccson.',
+  }
+  const interviewee = {
+    name: 'Harlan T. Wood',
+    background: [
+      'Architect of Enlightend Structures: Trust Graph, HoloFractal, CoreNexus',
+      'Software Engineer',
+      'Meditator',
+      'Mystery School Initiate',
+    ],
+  }
+  const topics = [
+    'the collaboration and autonomy that is the signature polarity of enlightened civilizations',
+    'the ability of civilizations, once they reach superintelligence, to soon after begin to create universes',
+    'The giant party going on around the galactic cores',
+    'the knitting together of galaxies through the supermassive black holes at the center of each galaxy',
+    'deep time vs slow time',
+    'the future of Earth civilization and the past and futures of the uncountable civilizations that have come before and will come after us',
+  ]
+
+  let systemPrompt = `${interviewer.instructions}
+
+You are interviewing ${
+    interviewee.name
+  } about the following topics - listed in order of importance: ${topics.join('; ')}.
+
+Here is the background information you have on ${interviewee.name}: ${interviewee.background.join(
+    '; '
+  )}.`
+
+  systemPrompt = systemPrompt.replace(/\s+/g, ' ').trim()
+  console.log(systemPrompt)
 
   // const MODEL_LIST = [
   //   {
@@ -22,8 +58,45 @@
   //   },
   // ]
 
-  onMount(async () => {
-    webllm = await import('@mlc-ai/web-llm')
+  onMount(initLlm)
+  onMount(initWhisper)
+
+  async function initLlm() {
+    const webllm = await import('@mlc-ai/web-llm')
+    // webworker (TODO: better):
+    // this may help: https://stackoverflow.com/questions/67995082/how-to-create-web-worker-in-a-sveltekit-app-on-vercel
+    // const chat = new webllm.ChatWorkerClient(
+    //   new Worker('/public/webllm/worker.js', { type: 'module' })
+    // )
+    // main thread (working, but worse):
+    chat = new webllm.ChatModule()
+
+    chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
+      console.log('init-label', report.text)
+    })
+    reloadLlm()
+  }
+
+  async function reloadLlm() {
+    // const appConfig = {
+    //   model_list: MODEL_LIST,
+    // }
+    const chatOpts = {
+      // repetition_penalty: 1.01,
+      conv_config: {
+        system: systemPrompt,
+      },
+    }
+
+    console.log('reloading model...')
+    // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
+    // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
+    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
+    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1')
+    console.log('done!')
+  }
+
+  async function initWhisper() {
     const whisper = await import('$lib/vendor/whisper/helpers')
     loadWhisper = whisper.loadWhisper
     onProcess = whisper.onProcess
@@ -39,60 +112,20 @@
       },
       monitorRunDependencies: function (_arg: unknown) {},
     }
-  })
+  }
 
   async function askQuestion() {
     const question = await getQuestion()
     await speakQuestion(question)
   }
 
-  async function getQuestion() {
-    // // webworker:
-    // const chat = new webllm.ChatWorkerClient(
-    //   new Worker('/public/webllm/worker.js', { type: 'module' })
-    // )
-    // main thread:
-    const chat = new webllm.ChatModule()
-
-    chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
-      console.log('init-label', report.text)
-    })
-
-    const appConfig = {
-      model_list: MODEL_LIST,
-    }
-    const chatOpts = {
-      // repetition_penalty: 1.01,
-      system:
-        'you only speak in ryhmes.  you are funny and everthing is a joke.  all your answers start with the letter Z',
-      conv_config: {
-        system:
-          'you only speak in ryhmes.  you are funny and everthing is a joke.  all your answers start with the letter Z',
-      },
-    }
-
-    console.log('reloading model...')
-    // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
-    // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
-    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
-    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1')
-    console.log('done!')
-
-    // const generateProgressCallback = (_step: number, message: string) => {
-    //   console.log('generate-label', message)
-    // }
-
-    const prompt0 = 'what is the meaning of life?'
+  async function getQuestion(): Promise<string> {
+    const prompt0 = 'Ask me a question'
     console.log(prompt0)
     const reply0 = await chat.generate(prompt0) //, generateProgressCallback)
     console.log(reply0)
-
-    const prompt1 = 'what is your name?'
-    console.log(prompt1)
-    const reply1 = await chat.generate(prompt1) //, generateProgressCallback)
-    console.log(reply1)
-
     console.log(await chat.runtimeStatsText())
+    return reply0
   }
 
   async function speakQuestion(question: string) {
@@ -102,7 +135,7 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text: 'what is the meaning of life?',
+        text: question,
         threadHead: 'uuid TODO', // NOTE thread "head" allows for branching convos
       }),
     })
