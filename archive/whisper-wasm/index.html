@@ -94,14 +94,14 @@
                 <input type="file" id="file" name="file" onchange="loadAudio(event)" />
             </div>
 
-            <div id="input_mic" style="display: none;">
+            <div id="input_mic" >
                 Microphone:
                 <button id="start" onclick="startRecording()">Start</button>
                 <button id="stop" onclick="stopRecording()" disabled>Stop</button>
 
                 <!-- progress bar to show recording progress -->
                 <br><br>
-                <div id="progress" style="display: none;">
+                <div id="progress" >
                     <div id="progress-bar" style="width: 0%; height: 10px; background-color: #4CAF50;"></div>
                     <div id="progress-text">0%</div>
                 </div>

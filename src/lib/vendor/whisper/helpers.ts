@@ -9,12 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-// export function convertTypedArray(src, type) {
-//     var buffer = new ArrayBuffer(src.byteLength);
-//     var baseView = new src.constructor(buffer).set(src);
-//     return new type(buffer);
-// }
-
 const printTextarea = (function () {
   const element = document.getElementById('output') as HTMLTextAreaElement
   if (element) element.value = '' // clear browser cache
@@ -27,13 +21,6 @@ const printTextarea = (function () {
     }
   }
 })()
-
-// export async function clearCache() {
-//     if (confirm('Are you sure you want to clear the cache?\nAll the models will be downloaded again.')) {
-//         indexedDB.deleteDatabase(dbName);
-//         location.reload();
-//     }
-// }
 
 // fetch a remote file from remote URL using the Fetch API
 export async function fetchRemote(url: string, cbProgress: Function, cbPrint: Function) {
@@ -144,20 +131,6 @@ function loadRemote(
         // data is not in the IndexedDB
         cbPrint('loadRemote: "' + url + '" is not in the IndexedDB')
 
-        // // alert and ask the user to confirm
-        // if (
-        // 	!confirm(
-        // 		'You are about to download ' +
-        // 			size_mb +
-        // 			' MB of data.\n' +
-        // 			'The model data will be cached in the browser for future use.\n\n' +
-        // 			'Press OK to continue.'
-        // 	)
-        // ) {
-        // 	cbCancel()
-        // 	return
-        // }
-
         fetchRemote(url, cbProgress, cbPrint).then(function (data) {
           if (data) {
             // store the data in the IndexedDB
@@ -206,11 +179,6 @@ function loadRemote(
     cbPrint('loadRemote: failed to open IndexedDB: blocked')
     cbCancel()
   }
-
-  rq.onabort = function (_event: Event) {
-    cbPrint('loadRemote: failed to open IndexedDB: abort')
-    cbCancel()
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -224,42 +192,24 @@ function loadRemote(
 ////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-// export function changeInput(input) {
-//   if (input == 'file') {
-//     document.getElementById('input_file').style.display = 'block';
-//     document.getElementById('input_mic').style.display = 'none';
-//     document.getElementById('progress').style.display = 'none';
-//   } else {
-// document.getElementById('input_file').style.display = 'none'
-document.getElementById('input_mic')!.style.display = 'block'
-document.getElementById('progress')!.style.display = 'block'
-//   }
-// }
-
-// // web audio context
+// web audio context
 let context: AudioContext | null = null
 
-// // audio data
+// audio data
 let audio: Float32Array | null = null
 
 // the whisper instance
 let instance: unknown = null
 let model_whisper = ''
 
-// // helper function
-// export function convertTypedArray(src, type) {
-//   var buffer = new ArrayBuffer(src.byteLength);
-//   var baseView = new src.constructor(buffer).set(src);
-//   return new type(buffer);
-// }
-
-// //
-// // load model
-// //
+//
+// load model
+//
 
 const dbVersion = 1
 const dbName = 'ai-interviewer'
-// const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
+const indexedDB =
+  window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
 
 function storeFS(fname: string, buf: Uint8Array) {
   // write to WASM file using FS_createDataFile
@@ -274,7 +224,7 @@ function storeFS(fname: string, buf: Uint8Array) {
   // @ts-expect-error
   window.Module.FS_createDataFile('/', fname, buf, true, true)
 
-  //model_whisper = fname;
+  model_whisper = fname
 
   document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
 
@@ -282,43 +232,6 @@ function storeFS(fname: string, buf: Uint8Array) {
 
   document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
 }
-
-// export function loadFile(event, fname) {
-//   var file = event.target.files[0] || null;
-//   if (file == null) {
-//     return;
-//   }
-
-//   printTextarea("loadFile: loading model: " + file.name + ", size: " + file.size + " bytes");
-//   printTextarea('loadFile: please wait ...');
-
-//   var reader = new FileReader();
-//   reader.onload = function (event) {
-//     var buf = new Uint8Array(reader.result);
-//     storeFS(fname, buf);
-//   }
-//   reader.readAsArrayBuffer(file);
-
-//   document.getElementById('fetch-whisper-tiny-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-en').style.display = 'none';
-//   document.getElementById('fetch-whisper-tiny').style.display = 'none';
-//   document.getElementById('fetch-whisper-base').style.display = 'none';
-//   document.getElementById('fetch-whisper-small').style.display = 'none';
-
-//   document.getElementById('fetch-whisper-tiny-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-tiny-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-base-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-en-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-small-q5_1').style.display = 'none';
-//   document.getElementById('fetch-whisper-medium-en-q5_0').style.display = 'none';
-//   document.getElementById('fetch-whisper-medium-q5_0').style.display = 'none';
-//   document.getElementById('fetch-whisper-large-q5_0').style.display = 'none';
-
-//   document.getElementById('whisper-file').style.display = 'none';
-//   document.getElementById('model-whisper-status').innerHTML = 'loaded model: ' + file.name;
-// }
 
 export function loadWhisper(model: string) {
   const urls = {
@@ -434,71 +347,18 @@ export function loadWhisper(model: string) {
   loadRemote(url, dst, size_mb, cbProgress, storeFS, cbCancel, printTextarea)
 }
 
-// //
-// // audio file
-// //
+//
+// microphone
+//
 
 // const kMaxAudio_s = 30 * 60;
-const kMaxRecording_s = 2 * 60
+const kMaxRecording_s = 60 * 60
 const kSampleRate = 16000
 
 // @ts-expect-error:
 window.AudioContext = window.AudioContext || window.webkitAudioContext
 // @ts-expect-error:
 window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
-
-// export function loadAudio(event) {
-//   if (!context) {
-//     context = new AudioContext({
-//       sampleRate: kSampleRate,
-//       channelCount: 1,
-//       echoCancellation: false,
-//       autoGainControl: true,
-//       noiseSuppression: true,
-//     });
-//   }
-
-//   var file = event.target.files[0] || null;
-//   if (file == null) {
-//     return;
-//   }
-
-//   printTextarea('js: loading audio: ' + file.name + ', size: ' + file.size + ' bytes');
-//   printTextarea('js: please wait ...');
-
-//   var reader = new FileReader();
-//   reader.onload = function (event) {
-//     var buf = new Uint8Array(reader.result);
-
-//     context.decodeAudioData(buf.buffer, function (audioBuffer) {
-//       var offlineContext = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
-//       var source = offlineContext.createBufferSource();
-//       source.buffer = audioBuffer;
-//       source.connect(offlineContext.destination);
-//       source.start(0);
-
-//       offlineContext.startRendering().then(function (renderedBuffer) {
-//         audio = renderedBuffer.getChannelData(0);
-//         printTextarea('js: audio loaded, size: ' + audio.length);
-
-//         // truncate to first 30 seconds
-//         if (audio.length > kMaxAudio_s * kSampleRate) {
-//           audio = audio.slice(0, kMaxAudio_s * kSampleRate);
-//           printTextarea('js: truncated audio to first ' + kMaxAudio_s + ' seconds');
-//         }
-
-//       });
-//     }, function (e) {
-//       printTextarea('js: error decoding audio: ' + e);
-//       audio = null;
-//     });
-//   }
-//   reader.readAsArrayBuffer(file);
-// }
-
-//
-// microphone
-//
 
 let mediaRecorder: MediaRecorder
 let doRecording = false
@@ -515,11 +375,6 @@ export function startRecording() {
   if (!context) {
     context = new AudioContext({
       sampleRate: kSampleRate,
-      // rest of options do not seem to exist :(
-      channelCount: 1,
-      echoCancellation: false,
-      autoGainControl: true,
-      noiseSuppression: true,
     })
   }
 
@@ -570,11 +425,11 @@ export function startRecording() {
                 audio = renderedBuffer.getChannelData(0)
                 printTextarea('js: audio recorded, size: ' + audio.length)
 
-                // truncate to first 30 seconds
-                if (audio.length > kMaxRecording_s * kSampleRate) {
-                  audio = audio.slice(0, kMaxRecording_s * kSampleRate)
-                  printTextarea('js: truncated audio to first ' + kMaxRecording_s + ' seconds')
-                }
+                // // truncate to first 30 seconds
+                // if (audio.length > kMaxRecording_s * kSampleRate) {
+                //   audio = audio.slice(0, kMaxRecording_s * kSampleRate)
+                //   printTextarea('js: truncated audio to first ' + kMaxRecording_s + ' seconds')
+                // }
               })
             },
             function (e) {
@@ -617,16 +472,11 @@ export function startRecording() {
   }, kMaxRecording_s * 1000)
 }
 
-// //
-// // transcribe
-// //
+//
+// transcribe
+//
 
 const nthreads = 8
-
-// export function changeThreads(value) {
-//   nthreads = value;
-//   document.getElementById('threads-value').innerHTML = nthreads;
-// }
 
 export function onProcess(translate: boolean) {
   if (!instance) {

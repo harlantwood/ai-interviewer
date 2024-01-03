@@ -17,6 +17,7 @@
     startRecording = whisper.startRecording
     stopRecording = whisper.stopRecording
 
+    // Note: global `Module` is the way we communicate with whisper's main.js - which is 1mb JS generated from whisper.cpp
     window.Module = {
       print: handleWhisperOutput,
       printErr: handleWhisperOutput,
@@ -45,8 +46,7 @@
     // find all lines of rawOutput of similar format to:
     // [00:00:00.000 --> 00:00:03.000]   Some text
     // and extract the text to `transcription`:
-
-    const regex = /\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\] (.*)/g
+    const regex = /\[(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\](.*)/g
     let match
     let transcriptionText = ''
     while ((match = regex.exec(rawOutput))) {
@@ -78,9 +78,7 @@
   }
 </script>
 
-<!-- [ Ask me a question ] -->
 <button on:click={() => askQuestion()}>Ask me a question</button>
-<!-- (ai speaks question, also printed out) -->
 
 <hr />
 
@@ -150,30 +148,18 @@
 
 <table>
   <tr>
-    <!-- <td> -->
     <select style:display="none" id="language" name="language">
       <option selected value="en">English</option>
     </select>
-    <!-- Language:  <select id="language" name="language"> <option value="en">English</option> <option value="ar">Arabic</option> <option value="hy">Armenian</option> <option value="az">Azerbaijani</option> <option value="eu">Basque</option> <option value="be">Belarusian</option> <option value="bn">Bengali</option> <option value="bg">Bulgarian</option> <option value="ca">Catalan</option> <option value="zh">Chinese</option> <option value="hr">Croatian</option> <option value="cs">Czech</option> <option value="da">Danish</option> <option value="nl">Dutch</option> <option value="en">English</option> <option value="et">Estonian</option> <option value="tl">Filipino</option> <option value="fi">Finnish</option> <option value="fr">French</option> <option value="gl">Galician</option> <option value="ka">Georgian</option> <option value="de">German</option> <option value="el">Greek</option> <option value="gu">Gujarati</option> <option value="iw">Hebrew</option> <option value="hi">Hindi</option> <option value="hu">Hungarian</option> <option value="is">Icelandic</option> <option value="id">Indonesian</option> <option value="ga">Irish</option> <option value="it">Italian</option> <option value="ja">Japanese</option> <option value="kn">Kannada</option> <option value="ko">Korean</option> <option value="la">Latin</option> <option value="lv">Latvian</option> <option value="lt">Lithuanian</option> <option value="mk">Macedonian</option> <option value="ms">Malay</option> <option value="mt">Maltese</option> <option value="no">Norwegian</option> <option value="fa">Persian</option> <option value="pl">Polish</option> <option value="pt">Portuguese</option> <option value="ro">Romanian</option> <option value="ru">Russian</option> <option value="sr">Serbian</option> <option value="sk">Slovak</option> <option value="sl">Slovenian</option> <option value="es">Spanish</option> <option value="sw">Swahili</option> <option value="sv">Swedish</option> <option value="ta">Tamil</option> <option value="te">Telugu</option> <option value="th">Thai</option> <option value="tr">Turkish</option> <option value="uk">Ukrainian</option> <option value="ur">Urdu</option> <option value="vi">Vietnamese</option> <option value="cy">Welsh</option> <option value="yi">Yiddish</option> </select> -->
-    <!-- </td> -->
-    <!-- Slider to select number of threads between 1 and 16 -->
-    <!-- <td>
-						Threads:
-						<input type="range" id="threads" name="threads" min="1" max="16" value="8" onchange="changeThreads(this.value)" />
-						<span id="threads-value">8</span>
-				</td> -->
     <td>
       <button on:click={() => onProcess(false)}>Transcribe</button>
     </td>
-    <!-- <td>
-			<button on:click={() => onProcess(true)}>Translate</button>
-		</td> -->
   </tr>
 </table>
 
 <br />
 
-<!-- textarea with height filling the rest of the page -->
+<!-- whisper output: -->
 <textarea id="output" bind:value={whisperOutput} rows="10"></textarea>
 
 <button on:click={() => console.log({ whisperOutput })}>show</button>
@@ -182,6 +168,7 @@
 <!-- [ I'm done ] -->
 <!-- [ Ask me another question ] -->
 
+<!-- here we load the main whisper JS - we do it inline, after setting `Module` which passes config -->
 {#if browser}
   <script type="text/javascript" src="/public/whisper/main.js"></script>
 {/if}
