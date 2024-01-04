@@ -12,41 +12,31 @@
   let whisperOutput: string
   let transcription: string = 'transcription...'
 
-  const interviewer = {
-    voice: 'nova',
-    instructions:
-      'You are an AI interviewer, asking me questions. Keep questions short, 1-3 sentences. You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaccson.',
-  }
-  const interviewee = {
-    name: 'Harlan T. Wood',
-    background: [
-      'Architect of Enlightend Structures: Trust Graph, HoloFractal, CoreNexus',
-      'Software Engineer',
-      'Meditator',
-      'Mystery School Initiate',
-    ],
-  }
-  const topics = [
-    'the collaboration and autonomy that is the signature polarity of enlightened civilizations',
-    'the ability of civilizations, once they reach superintelligence, to soon after begin to create universes',
-    'The giant party going on around the galactic cores',
-    'the knitting together of galaxies through the supermassive black holes at the center of each galaxy',
-    'deep time vs slow time',
-    'the future of Earth civilization and the past and futures of the uncountable civilizations that have come before and will come after us',
-  ]
+  let topics = clean(`
+    - the collaboration and autonomy that is the signature polarity of enlightened civilizations
+    - the ability of civilizations, once they reach superintelligence, to soon after begin to create universes
+    - The giant party going on around the galactic cores
+    - the knitting together of galaxies through the supermassive black holes at the center of each galaxy
+    - deep time vs slow time
+    - the future of Earth civilization and the past and futures of the uncountable civilizations that have come before and will come after us
+    `)
 
-  let systemPrompt = `${interviewer.instructions}
+  let myName = 'Harlan T Wood'
+  let myBackground = clean(`
+    - Architect of Enlightend Structures: Trust Graph, HoloFractal, CoreNexus
+    - Software Engineer
+    - Meditator
+    - Mystery School Initiate
+    `)
 
-You are interviewing ${
-    interviewee.name
-  } about the following topics - listed in order of importance: ${topics.join('; ')}.
-
-Here is the background information you have on ${interviewee.name}: ${interviewee.background.join(
-    '; '
-  )}.`
-
-  systemPrompt = systemPrompt.replace(/\s+/g, ' ').trim()
-  console.log(systemPrompt)
+  let interviewerVoice = 'nova'
+  let interviewerInstructions = clean(`
+    You are an AI interviewer, asking the user questions.
+    Keep questions short, 1-3 sentences.
+    You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaccson.
+    Ask follow up questions when appropriate, but also move throught the list of topics.
+    Topics need not be in order; feel free to weave in any topic that is organically coming up.
+    `)
 
   // const MODEL_LIST = [
   //   {
@@ -72,8 +62,12 @@ Here is the background information you have on ${interviewee.name}: ${interviewe
     chat = new webllm.ChatModule()
 
     chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
-      console.log('init-label', report.text)
+      console.log('[webllm]', report.text)
     })
+    reloadLlm()
+  }
+
+  function save() {
     reloadLlm()
   }
 
@@ -84,7 +78,7 @@ Here is the background information you have on ${interviewee.name}: ${interviewe
     const chatOpts = {
       // repetition_penalty: 1.01,
       conv_config: {
-        system: systemPrompt,
+        system: systemPrompt(),
       },
     }
 
@@ -112,6 +106,23 @@ Here is the background information you have on ${interviewee.name}: ${interviewe
       },
       monitorRunDependencies: function (_arg: unknown) {},
     }
+  }
+
+  function systemPrompt(): string {
+    let systemPrompt = clean(`${interviewerInstructions}
+      ----
+      You are interviewing ${myName} about the following topics, listed in order of importance:
+      ${topics}
+      ----
+      Here is the background information you have on ${myName}:
+      ${myBackground}.
+      `)
+    console.log(systemPrompt)
+    return systemPrompt
+  }
+
+  function clean(text: string) {
+    return text.replace(/^\s+/gm, '').trim()
   }
 
   async function askQuestion() {
@@ -176,7 +187,29 @@ Here is the background information you have on ${interviewee.name}: ${interviewe
   }
 </script>
 
-<button on:click={() => askQuestion()}>Ask me a question</button>
+<h1>AI Interviewer</h1>
+
+<h2>Topics</h2>
+Ask me about these topics:
+<textarea bind:value={topics} rows={10} cols={80} />
+
+<h2>About Me</h2>
+Name:<input bind:value={myName} />
+My background:
+<textarea bind:value={myBackground} rows={5} cols={80} />
+
+<h2>Interviewer</h2>
+Voice:<select bind:value={interviewerVoice}>
+  <option value="nova">Nova</option>
+</select>
+
+<textarea bind:value={interviewerInstructions} rows={5} cols={80} />
+
+<button on:click={save}>Save</button>
+
+<hr />
+
+<button on:click={askQuestion}>Ask me a question</button>
 
 <hr />
 
