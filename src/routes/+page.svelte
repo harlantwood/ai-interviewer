@@ -109,7 +109,8 @@
   }
 
   function systemPrompt(): string {
-    let systemPrompt = clean(`${interviewerInstructions}
+    let systemPrompt = clean(
+      `${interviewerInstructions}
       ----
       You are interviewing ${myName} about the following topics, listed in order of importance:
       ${topics}
