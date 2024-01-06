@@ -43,7 +43,9 @@ Work in progress, not ready to try, developing in public, check back later 😎
 
 ### Stage 2 - LLM Question Generation
 
-- [ ] feed convo to llm to determine next question
+- [x] set up topics etc in system prompt
+- [x] LLM asks initial question
+- [ ] feed whole convo to llm to determine next question
   - prefer: WASM llm - mistral7b or better
     - https://github.com/mlc-ai/web-llm
   - alt: gpt4[-turbo] api

@@ -19,6 +19,7 @@
     "test:unit": "vitest"
   },
   "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.14",
     "@supabase/supabase-js": "^2.39.1",
     "buffer": "^6.0.3",
     "openai": "^4.24.1"
