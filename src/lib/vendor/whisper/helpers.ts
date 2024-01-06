@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 const printTextarea = (function () {
-  const element = document.getElementById('output') as HTMLTextAreaElement
+  const element = document.getElementById('whisper_output') as HTMLTextAreaElement
   if (element) element.value = '' // clear browser cache
   return function (text: string) {
     if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')

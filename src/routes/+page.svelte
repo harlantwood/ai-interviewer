@@ -1,7 +1,11 @@
 <script lang="ts">
   import { browser } from '$app/environment'
   import { onMount } from 'svelte'
-  import WhisperLoadModel from '../components/whisper/WhisperLoadModel.svelte'
+  import { slide } from 'svelte/transition'
+
+  // import WhisperLoadModel from '../components/whisper/WhisperLoadModel.svelte'
+
+  let dev = true // dev mode shortcuts
 
   let chat //: ChatModule
 
@@ -39,6 +43,7 @@
     `)
 
   let currentQuestion = ''
+  let recording = false
 
   // const MODEL_LIST = [
   //   {
@@ -84,15 +89,13 @@
       },
     }
 
-    console.log('reloading model...')
     // aspirational, not working yet:
     // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
     // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
     // good:
-    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
-    // fast:
-    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
-    console.log('done!')
+    // await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
+    // fast but crazy bad ;)
+    await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
   }
 
   async function initWhisper() {
@@ -130,7 +133,7 @@
       ${myBackground}.
       `
     )
-    console.log(systemPrompt)
+    console.log('[system prompt]', systemPrompt)
     return systemPrompt
   }
 
@@ -140,8 +143,24 @@
 
   async function startInterview() {
     console.log('in startInterview...')
+    await beginQuestionTurn()
+  }
+
+  async function beginQuestionTurn() {
+    console.log('in beginQuestionTurn...')
+    recording = false
     const question = await getQuestion()
-    await speakQuestion(question)
+    const audio = await speakQuestion(question)
+    audio.onended = function () {
+      beginAnswerTurn()
+    }
+  }
+
+  async function beginAnswerTurn() {
+    console.log('in beginAnswerTurn...')
+    recording = true
+    transcription = ''
+    startRecording()
   }
 
   async function getQuestion(lastAnswer: string | null = null): Promise<string> {
@@ -157,7 +176,7 @@
     currentQuestion = msg
   }
 
-  async function speakQuestion(question: string) {
+  async function speakQuestion(question: string): Promise<Audio> {
     const res = await fetch('/api/question/audio', {
       method: 'POST',
       headers: {
@@ -171,7 +190,8 @@
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
-    audio.play()
+    audio.play().catch((e) => console.error('Error playing audio:', e))
+    return audio
   }
 
   function handleWhisperOutput(...args: string[]) {
@@ -204,6 +224,20 @@
     transcriptionText = transcriptionText.replace(/\s+/g, ' ')
     transcriptionText = transcriptionText.trim()
     return transcriptionText === '' ? null : transcriptionText
+  }
+
+  async function handleAnswerComplete() {
+    stopRecording()
+    recording = false
+    const lastAnswer = transcription
+    console.log('lastAnswer', lastAnswer)
+    await beginQuestionTurn()
+  }
+
+  function handleInterviewComplete() {
+    console.log('interview complete')
+    stopRecording()
+    recording = false
   }
 </script>
 
@@ -239,32 +273,19 @@ Voice:<select bind:value={interviewerVoice}>
 
 <!-- <WhisperLoadModel /> -->
 
-<hr />
-
 <!-- (user answers, recorded and transribed) -->
-<div id="input_mic">
-  Microphone:
-  <button id="start" on:click={() => startRecording()}>Start</button>
-  <button id="stop" on:click={() => stopRecording()} disabled>Stop</button>
-
-  <!-- progress bar to show recording progress -->
-  <br /><br />
-  <div id="progress" style="display: none;">
-    <div id="progress-bar" style="width: 0%; height: 10px; background-color: #4CAF50;"></div>
-    <div id="progress-text">0%</div>
-  </div>
+<div transition:slide={{ duration: 1000 }} class:visually-hidden={!recording}>
+  Recording...
+  <button on:click={handleAnswerComplete} class="block">My answer is complete</button>
+  <button on:click={handleInterviewComplete} class="block">End this interview</button>
 </div>
-
-<audio controls id="audio" loop>
-  Your browser does not support the &lt;audio&gt; tag.
-  <source id="source" src="" type="audio/wav" />
-</audio>
 
 <hr />
 
 <select style:display="none" id="language" name="language">
   <option selected value="en">English</option>
 </select>
+
 <button on:click={() => onProcess(false)}>Transcribe</button>
 
 <br />
