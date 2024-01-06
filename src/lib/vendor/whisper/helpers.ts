@@ -14,7 +14,7 @@ const printTextarea = (function () {
   if (element) element.value = '' // clear browser cache
   return function (text: string) {
     if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
-    console.log(text)
+    console.log('[whisper] [js] ' + text)
     if (element) {
       element.value += text + '\n'
       element.scrollTop = element.scrollHeight // focus on bottom
@@ -226,11 +226,14 @@ function storeFS(fname: string, buf: Uint8Array) {
 
   model_whisper = fname
 
-  document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
+  // document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
+  printTextarea('loaded "' + model_whisper)
 
+  // printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length)
   printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length)
 
-  document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
+  // document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
+  printTextarea('Model fetched: ' + model_whisper)
 }
 
 export function loadWhisper(model: string) {
@@ -278,25 +281,27 @@ export function loadWhisper(model: string) {
 
   model_whisper = model
 
-  document.getElementById('fetch-whisper-tiny-en')!.style.display = 'none'
-  document.getElementById('fetch-whisper-base-en')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-tiny-en')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-base-en')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small-en')!.style.display = 'none'
   // document.getElementById('fetch-whisper-tiny')!.style.display = 'none'
   // document.getElementById('fetch-whisper-base')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small')!.style.display = 'none'
 
-  document.getElementById('fetch-whisper-tiny-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-tiny-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-tiny-q5_1')!.style.display = 'none';
-  document.getElementById('fetch-whisper-base-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-base-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-base-q5_1')!.style.display = 'none';
-  document.getElementById('fetch-whisper-small-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-small-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small-q5_1')!.style.display = 'none';
   // document.getElementById('fetch-whisper-medium-en-q5_0')!.style.display = 'none';
   // document.getElementById('fetch-whisper-medium-q5_0')!.style.display = 'none';
   // document.getElementById('fetch-whisper-large-q5_0')!.style.display = 'none';
 
   // document.getElementById('whisper-file')!.style.display = 'none';
-  document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
+
+  // document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
+  printTextarea('loading model: ' + model)
 
   const cbProgress = function (p: number) {
     const el = document.getElementById('fetch-whisper-progress')!
@@ -423,17 +428,17 @@ export function startRecording() {
 
               offlineContext.startRendering().then(function (renderedBuffer) {
                 audio = renderedBuffer.getChannelData(0)
-                printTextarea('js: audio recorded, size: ' + audio.length)
+                printTextarea('audio recorded, size: ' + audio.length)
 
                 // // truncate to first 30 seconds
                 // if (audio.length > kMaxRecording_s * kSampleRate) {
                 //   audio = audio.slice(0, kMaxRecording_s * kSampleRate)
-                //   printTextarea('js: truncated audio to first ' + kMaxRecording_s + ' seconds')
+                //   printTextarea('truncated audio to first ' + kMaxRecording_s + ' seconds')
                 // }
               })
             },
             function (e) {
-              printTextarea('js: error decoding audio: ' + e)
+              printTextarea('error decoding audio: ' + e)
               audio = null
             }
           )
@@ -444,7 +449,7 @@ export function startRecording() {
       mediaRecorder.start()
     })
     .catch(function (err) {
-      printTextarea('js: error getting audio stream: ' + err)
+      printTextarea('error getting audio stream: ' + err)
     })
 
   var interval = setInterval(function () {
@@ -462,11 +467,11 @@ export function startRecording() {
       ((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
   }, 1000)
 
-  printTextarea('js: recording ...')
+  printTextarea('recording ...')
 
   setTimeout(function () {
     if (doRecording) {
-      printTextarea('js: recording stopped after ' + kMaxRecording_s + ' seconds')
+      printTextarea('recording stopped after ' + kMaxRecording_s + ' seconds')
       stopRecording()
     }
   }, kMaxRecording_s * 1000)
@@ -484,24 +489,25 @@ export function onProcess(translate: boolean) {
     instance = window.Module.init('whisper.bin')
 
     if (instance) {
-      printTextarea('js: whisper initialized, instance: ' + instance)
-      document.getElementById('model')!.innerHTML = 'Model loaded: ' + model_whisper
+      printTextarea('whisper initialized, instance: ' + instance)
+      // document.getElementById('model')!.innerHTML = 'Model loaded: ' + model_whisper
+      printTextarea('Model loaded: ' + model_whisper)
     }
   }
 
   if (!instance) {
-    printTextarea('js: failed to initialize whisper')
+    printTextarea('failed to initialize whisper')
     return
   }
 
   if (!audio) {
-    printTextarea('js: no audio data')
+    printTextarea('no audio data')
     return
   }
 
   if (instance) {
     printTextarea('')
-    printTextarea('js: processing - this might take a while ...')
+    printTextarea('processing - this might take a while ...')
     printTextarea('')
 
     setTimeout(function () {
@@ -512,9 +518,9 @@ export function onProcess(translate: boolean) {
         nthreads,
         translate
       )
-      console.log('js: full_default returned: ' + ret)
+      printTextarea('full_default returned: ' + ret)
       if (ret) {
-        printTextarea('js: whisper returned: ' + ret)
+        printTextarea('whisper returned: ' + ret)
       }
     }, 100)
   }

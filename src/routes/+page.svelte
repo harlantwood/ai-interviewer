@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment'
   import { onMount } from 'svelte'
+  import WhisperLoadModel from '../components/whisper/WhisperLoadModel.svelte'
 
   let chat //: ChatModule
 
@@ -9,8 +10,7 @@
   let startRecording: Function
   let stopRecording: Function
 
-  let whisperOutput: string
-  let transcription: string = 'transcription...'
+  let transcription: string = ''
 
   let topics = clean(`
     - the collaboration and autonomy that is the signature polarity of enlightened civilizations
@@ -33,7 +33,7 @@
   let interviewerInstructions = clean(`
     You are an AI interviewer, asking the user questions.
     Keep questions short, 1-3 sentences.
-    You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaccson.
+    You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaacson.
     Ask follow up questions when appropriate, but also move throught the list of topics.
     Topics need not be in order; feel free to weave in any topic that is organically coming up.
     `)
@@ -105,12 +105,18 @@
     // Note: global `Module` is the way we communicate with whisper's main.js - which is 1mb JS generated from whisper.cpp
     window.Module = {
       print: handleWhisperOutput,
-      printErr: handleWhisperOutput,
+      printErr: handleWhisperError,
       setStatus: function (text: string) {
-        handleWhisperOutput('js: ' + text)
+        if (text?.trim().length > 0) {
+          console.log('[whisper] [status] ' + text)
+        }
       },
-      monitorRunDependencies: function (_arg: unknown) {},
+      monitorRunDependencies: function (_arg) {
+        // console.log('[whisper] [monitorRunDependencies] ' + arg)
+      },
     }
+
+    loadWhisper('tiny.en')
   }
 
   function systemPrompt(): string {
@@ -122,7 +128,8 @@
       ----
       Here is the background information you have on ${myName}:
       ${myBackground}.
-      `)
+      `
+    )
     console.log(systemPrompt)
     return systemPrompt
   }
@@ -168,16 +175,18 @@
   }
 
   function handleWhisperOutput(...args: string[]) {
-    let text
-    if (arguments.length === 1) {
-      text = args[0]
-    } else {
-      text = args.join(' ')
+    for (const output of args) {
+      console.log('[whisper] ' + output)
+      const newTranscription = parseTranscription(output)
+      if (newTranscription) {
+        transcription += '\n' + newTranscription
+      }
     }
-    console.log('[whisper] ' + text)
-    const newTranscription = parseTranscription(text)
-    if (newTranscription) {
-      transcription += '\n' + newTranscription
+  }
+
+  function handleWhisperError(...args: string[]) {
+    for (const arg of args) {
+      console.log('[whisper] [debug] ' + arg)
     }
   }
 
@@ -228,45 +237,7 @@ Voice:<select bind:value={interviewerVoice}>
 
 <hr />
 
-<div id="model">
-  Whisper models: <span id="model-whisper-status"></span><br /><br />
-  <button id="fetch-whisper-tiny-en" on:click={() => loadWhisper('tiny.en')}>tiny.en (75 MB)</button
-  >
-  <!-- <button id="fetch-whisper-tiny" on:click={() => loadWhisper('tiny')}>tiny (75 MB)</button> -->
-  <button id="fetch-whisper-base-en" on:click={() => loadWhisper('base.en')}
-    >base.en (142 MB)</button
-  >
-  <!-- <button id="fetch-whisper-base" on:click={() => loadWhisper('base')}>base (142 MB)</button> -->
-  <!-- <button id="fetch-whisper-small-en" on:click={() => loadWhisper('small.en')} >small.en (466 MB)</button > -->
-  <!-- <button id="fetch-whisper-small" on:click={() => loadWhisper('small')}>small (466 MB)</button> -->
-  <!-- <input type="file" id="whisper-file" name="file" onchange="loadFile(event, 'whisper.bin')" /> -->
-
-  <hr />
-
-  Quantized models:<small>(lower quality for a given level but faster download)</small><br /><br />
-  <button id="fetch-whisper-tiny-en-q5_1" on:click={() => loadWhisper('tiny-en-q5_1')}
-    >tiny.en (Q5_1, 31 MB)</button
-  >
-  <!-- <button id="fetch-whisper-tiny-q5_1" on:click={()=> loadWhisper('tiny-q5_1')}>tiny (Q5_1, 31 MB)</button > -->
-  <button id="fetch-whisper-base-en-q5_1" on:click={() => loadWhisper('base-en-q5_1')}
-    >base.en (Q5_1, 57 MB)</button
-  >
-  <!-- <button id="fetch-whisper-base-q5_1" on:click={() => loadWhisper('base-q5_1')} >base (Q5_1, 57 MB)</button > -->
-  <button id="fetch-whisper-small-en-q5_1" on:click={() => loadWhisper('small-en-q5_1')}
-    >small.en (Q5_1, 182 MB)</button
-  >
-  <!-- <button id="fetch-whisper-small-q5_1" on:click={() => loadWhisper('small-q5_1')} >small (Q5_1, 182 MB)</button ><br /> -->
-  <!-- <button id="fetch-whisper-medium-en-q5_0" on:click={() => loadWhisper('medium-en-q5_0')}
-		>medium.en (Q5_0, 515 MB)</button
-	> -->
-  <!-- <button id="fetch-whisper-medium-q5_0" on:click={() => loadWhisper('medium-q5_0')}
-		>medium (Q5_0, 515 MB)</button
-	> -->
-  <!-- <button id="fetch-whisper-large-q5_0" on:click={() => loadWhisper('large-q5_0')}
-		>large (Q5_0, 1030 MB)</button
-	> -->
-  <span id="fetch-whisper-progress"></span>
-</div>
+<!-- <WhisperLoadModel /> -->
 
 <hr />
 
@@ -290,25 +261,14 @@ Voice:<select bind:value={interviewerVoice}>
 </audio>
 
 <hr />
-<br />
 
-<table>
-  <tr>
-    <select style:display="none" id="language" name="language">
-      <option selected value="en">English</option>
-    </select>
-    <td>
-      <button on:click={() => onProcess(false)}>Transcribe</button>
-    </td>
-  </tr>
-</table>
+<select style:display="none" id="language" name="language">
+  <option selected value="en">English</option>
+</select>
+<button on:click={() => onProcess(false)}>Transcribe</button>
 
 <br />
 
-<!-- whisper output: -->
-<textarea id="output" bind:value={whisperOutput} rows="10"></textarea>
-
-<button on:click={() => console.log({ whisperOutput })}>show</button>
 <h2>Transcription</h2>
 <div>{transcription}</div>
 
