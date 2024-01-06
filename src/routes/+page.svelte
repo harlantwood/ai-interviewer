@@ -38,6 +38,8 @@
     Topics need not be in order; feel free to weave in any topic that is organically coming up.
     `)
 
+  let currentQuestion = ''
+
   // const MODEL_LIST = [
   //   {
   //     model_url: 'https://huggingface.co/mlc-ai/Mistral-7B-Instruct-v0.2-q4f16_1-MLC/resolve/main/',
@@ -83,10 +85,13 @@
     }
 
     console.log('reloading model...')
+    // aspirational, not working yet:
     // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
     // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
+    // good:
     await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
-    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1')
+    // fast:
+    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
     console.log('done!')
   }
 
@@ -126,18 +131,23 @@
     return text.replace(/^\s+/gm, '').trim()
   }
 
-  async function askQuestion() {
+  async function startInterview() {
+    console.log('in startInterview...')
     const question = await getQuestion()
     await speakQuestion(question)
   }
 
-  async function getQuestion(): Promise<string> {
-    const prompt0 = 'Ask me a question'
-    console.log(prompt0)
-    const reply0 = await chat.generate(prompt0) //, generateProgressCallback)
-    console.log(reply0)
-    console.log(await chat.runtimeStatsText())
-    return reply0
+  async function getQuestion(lastAnswer: string | null = null): Promise<string> {
+    let question
+    question = await chat.generate(lastAnswer, onChatGenerate)
+    console.log(question)
+    console.log('stats', await chat.runtimeStatsText())
+    return question
+  }
+
+  async function onChatGenerate(_step: number, msg: string) {
+    // console.log('onChatGenerate', step, msg)
+    currentQuestion = msg
   }
 
   async function speakQuestion(question: string) {
@@ -210,7 +220,11 @@ Voice:<select bind:value={interviewerVoice}>
 
 <hr />
 
-<button on:click={askQuestion}>Ask me a question</button>
+<button on:click={startInterview}>Start Interview</button>
+<!-- <button on:click={stopInterview}>Stop Interview</button> -->
+
+<hr />
+<div>{currentQuestion}</div>
 
 <hr />
 
@@ -295,7 +309,8 @@ Voice:<select bind:value={interviewerVoice}>
 <textarea id="output" bind:value={whisperOutput} rows="10"></textarea>
 
 <button on:click={() => console.log({ whisperOutput })}>show</button>
-<div bind:innerText={transcription} contenteditable></div>
+<h2>Transcription</h2>
+<div>{transcription}</div>
 
 <!-- [ I'm done ] -->
 <!-- [ Ask me another question ] -->
