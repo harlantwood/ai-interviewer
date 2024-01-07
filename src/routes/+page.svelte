@@ -36,7 +36,7 @@
   let interviewerVoice = 'nova'
   let interviewerInstructions = clean(`
     You are an AI interviewer, asking the user questions.
-    Keep questions short, 1-3 sentences.
+    Keep questions short, ${dev ? '10 WORDS AT MOST' : '1-3 sentences'}.
     You have shades of great interviewers like Lex Friedman, Terry Gross, and Walter Isaacson.
     Ask follow up questions when appropriate, but also move throught the list of topics.
     Topics need not be in order; feel free to weave in any topic that is organically coming up.
@@ -72,7 +72,9 @@
     chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
       console.log('[webllm]', report.text)
     })
-    reloadLlm()
+    if (!dev) {
+      reloadLlm()
+    }
   }
 
   function save() {
@@ -94,9 +96,9 @@
     // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
     // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
     // good:
-    // await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
+    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
     // fast but crazy bad ;)
-    await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
+    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
   }
 
   async function initWhisper() {
@@ -142,7 +144,7 @@
     return text.replace(/^\s+/gm, '').trim()
   }
 
-  async function startInterview() {
+  async function beginInterview() {
     await beginQuestionTurn()
   }
 
@@ -165,9 +167,14 @@
 
   async function getQuestion(): Promise<string> {
     let question
-    question = await chat.generate(lastAnswer, onChatGenerate)
-    console.log(question)
-    console.log('stats', await chat.runtimeStatsText())
+    if (dev) {
+      question = 'What is the meaning of life?'
+      currentQuestion = question
+    } else {
+      question = await chat.generate(lastAnswer, onChatGenerate)
+    }
+    console.log('question', question)
+    // console.log('stats', await chat.runtimeStatsText())
     return question
   }
 
@@ -262,7 +269,7 @@ Voice:<select bind:value={interviewerVoice}>
 <button on:click={save}>Save</button>
 
 <hr />
-<button on:click={startInterview}>Start Interview</button>
+<button on:click={beginInterview}>Start Interview</button>
 
 <hr />
 <div>{currentQuestion}</div>

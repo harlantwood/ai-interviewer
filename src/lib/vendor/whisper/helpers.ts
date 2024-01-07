@@ -304,50 +304,11 @@ export function loadWhisper(model: string) {
   printTextarea('loading model: ' + model)
 
   const cbProgress = function (p: number) {
-    const el = document.getElementById('fetch-whisper-progress')!
-    el.innerHTML = Math.round(100 * p) + '%'
+    // const el = document.getElementById('fetch-whisper-progress')!
+    // el.innerHTML = Math.round(100 * p) + '%'
   }
 
-  const cbCancel = function () {
-    let el
-
-    el = document.getElementById('fetch-whisper-tiny-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-tiny')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small')
-    if (el) el.style.display = 'inline-block'
-
-    el = document.getElementById('fetch-whisper-tiny-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-tiny-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-medium-en-q5_0')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-medium-q5_0')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-large-q5_0')
-    if (el) el.style.display = 'inline-block'
-
-    el = document.getElementById('whisper-file')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('model-whisper-status')
-    if (el) el.innerHTML = ''
-  }
+  const cbCancel = function () {}
 
   loadRemote(url, dst, size_mb, cbProgress, storeFS, cbCancel, printTextarea)
 }
@@ -453,10 +414,10 @@ export function startRecording() {
       })
     }
 
-    document.getElementById('progress-bar')!.style.width =
-      (100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
-    document.getElementById('progress-text')!.innerHTML =
-      ((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
+    // document.getElementById('progress-bar')!.style.width =
+    //   (100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
+    // document.getElementById('progress-text')!.innerHTML =
+    //   ((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
   }, 1000)
 
   printTextarea('recording ...')
