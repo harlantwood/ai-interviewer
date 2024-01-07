@@ -152,37 +152,15 @@
     console.log('in beginQuestionTurn...')
     recording = false
     const question = await getQuestion()
-    const audio = await speakQuestion(question)
-    audio.onended = function () {
-      beginAnswerTurn()
-    }
-  }
-
-  async function beginAnswerTurn() {
-    console.log('in beginAnswerTurn...')
-    recording = true
-    transcription = ''
-    startRecording(handleAnswerAudioReady)
-  }
-
-  function handleAnswerAudioReady() {
-    console.log('handleAnswerAudioReady')
-    transcribe()
-  }
-
-  async function handleTranscriptionComplete() {
-    console.log('handleTranscriptionComplete')
-    lastAnswer = transcription // TODO wait for transcription to be done
-    console.log('lastAnswer', lastAnswer)
-    if (!dev) {
-      await beginQuestionTurn()
-    }
+    await speakQuestion(question)
+    // const audio = await speakQuestion(question)
   }
 
   async function getQuestion(): Promise<string> {
     let question
     if (dev) {
-      question = 'What is the meaning of life?'
+      const topicList = topics.split('\n')
+      question = topicList[Math.floor(Math.random() * topicList.length)]
       currentQuestion = question
     } else {
       question = await chat.generate(lastAnswer, onChatGenerate)
@@ -190,22 +168,6 @@
     console.log('question', question)
     // console.log('stats', await chat.runtimeStatsText())
     return question
-  }
-
-  async function handleAnswerComplete() {
-    stopRecording()
-    recording = false
-  }
-
-  function handleInterviewComplete() {
-    console.log('interview complete')
-    stopRecording()
-    recording = false
-  }
-
-  async function onChatGenerate(_step: number, msg: string) {
-    // console.log('onChatGenerate', step, msg)
-    currentQuestion = msg
   }
 
   async function speakQuestion(question: string): Promise<Audio> {
@@ -222,8 +184,48 @@
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
-    audio.play().catch((e) => console.error('Error playing audio:', e))
-    return audio
+    audio.onended = function () {
+      beginAnswerTurn()
+    }
+    await audio.play() //.catch((e) => console.error('Error playing audio:', e))
+    // return audio
+  }
+
+  async function beginAnswerTurn() {
+    console.log('beginAnswerTurn')
+    recording = true
+    transcription = ''
+    startRecording(handleAnswerAudioReady)
+  }
+
+  function handleAnswerAudioReady() {
+    console.log('handleAnswerAudioReady')
+    transcribe()
+  }
+
+  async function handleTranscriptionComplete() {
+    console.log('handleTranscriptionComplete')
+    lastAnswer = transcription // TODO wait for transcription to be done
+    console.log('lastAnswer', lastAnswer)
+    // if (!dev) {
+    await beginQuestionTurn()
+    // }
+  }
+
+  async function handleAnswerComplete() {
+    stopRecording()
+    recording = false
+  }
+
+  function handleInterviewComplete() {
+    console.log('interview complete')
+    stopRecording()
+    recording = false
+  }
+
+  async function onChatGenerate(_step: number, msg: string) {
+    // console.log('onChatGenerate', step, msg)
+    currentQuestion = msg
   }
 
   function handleWhisperOutput(...args: string[]) {
