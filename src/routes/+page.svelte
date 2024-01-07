@@ -44,6 +44,7 @@
 
   let currentQuestion = ''
   let recording = false
+  let lastAnswer: string | null = null
 
   // const MODEL_LIST = [
   //   {
@@ -142,7 +143,6 @@
   }
 
   async function startInterview() {
-    console.log('in startInterview...')
     await beginQuestionTurn()
   }
 
@@ -163,12 +163,26 @@
     startRecording()
   }
 
-  async function getQuestion(lastAnswer: string | null = null): Promise<string> {
+  async function getQuestion(): Promise<string> {
     let question
     question = await chat.generate(lastAnswer, onChatGenerate)
     console.log(question)
     console.log('stats', await chat.runtimeStatsText())
     return question
+  }
+
+  async function handleAnswerComplete() {
+    stopRecording()
+    recording = false
+    lastAnswer = transcription // TODO wait for transcription to be done
+    console.log('lastAnswer', lastAnswer)
+    await beginQuestionTurn()
+  }
+
+  function handleInterviewComplete() {
+    console.log('interview complete')
+    stopRecording()
+    recording = false
   }
 
   async function onChatGenerate(_step: number, msg: string) {
@@ -224,20 +238,6 @@
     transcriptionText = transcriptionText.replace(/\s+/g, ' ')
     transcriptionText = transcriptionText.trim()
     return transcriptionText === '' ? null : transcriptionText
-  }
-
-  async function handleAnswerComplete() {
-    stopRecording()
-    recording = false
-    const lastAnswer = transcription
-    console.log('lastAnswer', lastAnswer)
-    await beginQuestionTurn()
-  }
-
-  function handleInterviewComplete() {
-    console.log('interview complete')
-    stopRecording()
-    recording = false
   }
 </script>
 
