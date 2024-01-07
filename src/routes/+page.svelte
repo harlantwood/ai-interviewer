@@ -262,39 +262,28 @@ Voice:<select bind:value={interviewerVoice}>
 <button on:click={save}>Save</button>
 
 <hr />
-
 <button on:click={startInterview}>Start Interview</button>
-<!-- <button on:click={stopInterview}>Stop Interview</button> -->
 
 <hr />
 <div>{currentQuestion}</div>
 
-<hr />
-
 <!-- <WhisperLoadModel /> -->
 
-<!-- (user answers, recorded and transribed) -->
 <div transition:slide={{ duration: 1000 }} class:visually-hidden={!recording}>
+  <hr />
   Recording...
   <button on:click={handleAnswerComplete} class="block">My answer is complete</button>
   <button on:click={handleInterviewComplete} class="block">End this interview</button>
 </div>
 
-<hr />
-
 <select style:display="none" id="language" name="language">
   <option selected value="en">English</option>
 </select>
 
-<button on:click={() => onProcess(false)}>Transcribe</button>
-
-<br />
+<!-- <button on:click={() => onProcess(false)}>Transcribe</button> -->
 
 <h2>Transcription</h2>
 <div>{transcription}</div>
-
-<!-- [ I'm done ] -->
-<!-- [ Ask me another question ] -->
 
 <!-- here we load the main whisper JS - we do it inline, after setting `Module` which passes config -->
 {#if browser}
