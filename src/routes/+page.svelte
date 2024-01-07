@@ -10,7 +10,7 @@
   let chat //: ChatModule
 
   let loadWhisper: Function
-  let onProcess: Function
+  let transcribe: Function
   let startRecording: Function
   let stopRecording: Function
 
@@ -104,7 +104,7 @@
   async function initWhisper() {
     const whisper = await import('$lib/vendor/whisper/helpers')
     loadWhisper = whisper.loadWhisper
-    onProcess = whisper.onProcess
+    transcribe = whisper.onProcess
     startRecording = whisper.startRecording
     stopRecording = whisper.stopRecording
 
@@ -162,7 +162,21 @@
     console.log('in beginAnswerTurn...')
     recording = true
     transcription = ''
-    startRecording()
+    startRecording(handleAnswerAudioReady)
+  }
+
+  function handleAnswerAudioReady() {
+    console.log('handleAnswerAudioReady')
+    transcribe()
+  }
+
+  async function handleTranscriptionComplete() {
+    console.log('handleTranscriptionComplete')
+    lastAnswer = transcription // TODO wait for transcription to be done
+    console.log('lastAnswer', lastAnswer)
+    if (!dev) {
+      await beginQuestionTurn()
+    }
   }
 
   async function getQuestion(): Promise<string> {
@@ -181,9 +195,6 @@
   async function handleAnswerComplete() {
     stopRecording()
     recording = false
-    lastAnswer = transcription // TODO wait for transcription to be done
-    console.log('lastAnswer', lastAnswer)
-    await beginQuestionTurn()
   }
 
   function handleInterviewComplete() {
@@ -217,17 +228,24 @@
 
   function handleWhisperOutput(...args: string[]) {
     for (const output of args) {
-      console.log('[whisper] ' + output)
-      const newTranscription = parseTranscription(output)
-      if (newTranscription) {
-        transcription += '\n' + newTranscription
+      if (output?.trim().length > 0) {
+        console.log('[whisper] ' + output)
+        const newTranscription = parseTranscription(output)
+        if (newTranscription) {
+          transcription += '\n' + newTranscription
+        }
       }
     }
   }
 
   function handleWhisperError(...args: string[]) {
-    for (const arg of args) {
-      console.log('[whisper] [debug] ' + arg)
+    for (const output of args) {
+      if (output?.trim().length > 0) {
+        console.log('[whisper] [debug] ' + output)
+        if (output.startsWith('whisper_print_timings:')) {
+          handleTranscriptionComplete()
+        }
+      }
     }
   }
 
@@ -286,8 +304,6 @@ Voice:<select bind:value={interviewerVoice}>
 <select style:display="none" id="language" name="language">
   <option selected value="en">English</option>
 </select>
-
-<!-- <button on:click={() => onProcess(false)}>Transcribe</button> -->
 
 <h2>Transcription</h2>
 <div>{transcription}</div>

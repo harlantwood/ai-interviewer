@@ -318,7 +318,7 @@ export function loadWhisper(model: string) {
 //
 
 // const kMaxAudio_s = 30 * 60;
-const kMaxRecording_s = 60 * 60
+const kMaxRecording_s = 60 * 60 // 60 min
 const kSampleRate = 16000
 
 // @ts-expect-error:
@@ -337,7 +337,7 @@ export function stopRecording() {
 // record up to kMaxRecording_s seconds of audio from the microphone
 // check if doRecording is false every 1000 ms and stop recording if so
 // update progress information
-export function startRecording() {
+export function startRecording(cbAudioReady: () => void) {
   if (!context) {
     context = new AudioContext({
       sampleRate: kSampleRate,
@@ -363,7 +363,7 @@ export function startRecording() {
         console.log('ON STOP - MAYBE CALLBACK TO CALLER?')
 
         const reader = new FileReader()
-        reader.onload = function (event) {
+        reader.onload = function (_event) {
           const buf = new Uint8Array(reader.result)
 
           context!.decodeAudioData(
@@ -382,6 +382,7 @@ export function startRecording() {
               offlineContext.startRendering().then(function (renderedBuffer) {
                 audio = renderedBuffer.getChannelData(0)
                 printTextarea('audio recorded, size: ' + audio.length)
+                cbAudioReady()
 
                 // // truncate to first 30 seconds
                 // if (audio.length > kMaxRecording_s * kSampleRate) {
@@ -413,7 +414,6 @@ export function startRecording() {
         track.stop()
       })
     }
-
     // document.getElementById('progress-bar')!.style.width =
     //   (100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
     // document.getElementById('progress-text')!.innerHTML =
@@ -436,7 +436,7 @@ export function startRecording() {
 
 const nthreads = 8
 
-export function onProcess(translate: boolean) {
+export function onProcess(translate: boolean = false) {
   if (!instance) {
     // @ts-expect-error:
     instance = window.Module.init('whisper.bin')
@@ -458,23 +458,18 @@ export function onProcess(translate: boolean) {
     return
   }
 
-  if (instance) {
-    printTextarea('')
-    printTextarea('processing - this might take a while ...')
-    printTextarea('')
+  printTextarea('processing - this might take a while ...')
 
-    setTimeout(function () {
-      const ret = window.Module.full_default(
-        instance,
-        audio,
-        document.getElementById('language')!.value,
-        nthreads,
-        translate
-      )
-      printTextarea('full_default returned: ' + ret)
-      if (ret) {
-        printTextarea('whisper returned: ' + ret)
-      }
-    }, 100)
-  }
+  setTimeout(function () {
+    const ret = window.Module.full_default(
+      instance,
+      audio,
+      document.getElementById('language')!.value,
+      nthreads,
+      translate
+    )
+    if (ret && ret.trim().length > 0) {
+      printTextarea('[full_default] ' + ret)
+    }
+  }, 100)
 }
