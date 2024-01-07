@@ -382,13 +382,6 @@ export function startRecording() {
       sampleRate: kSampleRate,
     })
   }
-
-  ;(document.getElementById('start') as HTMLButtonElement).disabled = true
-  ;(document.getElementById('stop') as HTMLButtonElement).disabled = false
-
-  document.getElementById('progress-bar')!.style.width = '0%'
-  document.getElementById('progress-text')!.innerHTML = '0%'
-
   doRecording = true
   startTime = Date.now()
 
@@ -406,8 +399,7 @@ export function startRecording() {
       mediaRecorder.onstop = function (e) {
         const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
         chunks = []
-        ;(document.getElementById('start') as HTMLButtonElement).disabled = false
-        ;(document.getElementById('stop') as HTMLButtonElement).disabled = true
+        console.log('ON STOP - MAYBE CALLBACK TO CALLER?')
 
         const reader = new FileReader()
         reader.onload = function (event) {
