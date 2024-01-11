@@ -10,11 +10,11 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 const printTextarea = (function () {
-  const element = document.getElementById('output') as HTMLTextAreaElement
+  const element = document.getElementById('whisper_output') as HTMLTextAreaElement
   if (element) element.value = '' // clear browser cache
   return function (text: string) {
     if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ')
-    console.log(text)
+    console.log('[whisper] [js] ' + text)
     if (element) {
       element.value += text + '\n'
       element.scrollTop = element.scrollHeight // focus on bottom
@@ -226,11 +226,14 @@ function storeFS(fname: string, buf: Uint8Array) {
 
   model_whisper = fname
 
-  document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
+  // document.getElementById('model-whisper-status')!.innerHTML = 'loaded "' + model_whisper + '"!'
+  printTextarea('loaded "' + model_whisper)
 
+  // printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length)
   printTextarea('storeFS: stored model: ' + fname + ' size: ' + buf.length)
 
-  document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
+  // document.getElementById('model')!.innerHTML = 'Model fetched: ' + model_whisper
+  printTextarea('Model fetched: ' + model_whisper)
 }
 
 export function loadWhisper(model: string) {
@@ -278,71 +281,34 @@ export function loadWhisper(model: string) {
 
   model_whisper = model
 
-  document.getElementById('fetch-whisper-tiny-en')!.style.display = 'none'
-  document.getElementById('fetch-whisper-base-en')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-tiny-en')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-base-en')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small-en')!.style.display = 'none'
   // document.getElementById('fetch-whisper-tiny')!.style.display = 'none'
   // document.getElementById('fetch-whisper-base')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small')!.style.display = 'none'
 
-  document.getElementById('fetch-whisper-tiny-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-tiny-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-tiny-q5_1')!.style.display = 'none';
-  document.getElementById('fetch-whisper-base-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-base-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-base-q5_1')!.style.display = 'none';
-  document.getElementById('fetch-whisper-small-en-q5_1')!.style.display = 'none'
+  // document.getElementById('fetch-whisper-small-en-q5_1')!.style.display = 'none'
   // document.getElementById('fetch-whisper-small-q5_1')!.style.display = 'none';
   // document.getElementById('fetch-whisper-medium-en-q5_0')!.style.display = 'none';
   // document.getElementById('fetch-whisper-medium-q5_0')!.style.display = 'none';
   // document.getElementById('fetch-whisper-large-q5_0')!.style.display = 'none';
 
   // document.getElementById('whisper-file')!.style.display = 'none';
-  document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
+
+  // document.getElementById('model-whisper-status')!.innerHTML = 'loading model: ' + model
+  printTextarea('loading model: ' + model)
 
   const cbProgress = function (p: number) {
-    const el = document.getElementById('fetch-whisper-progress')!
-    el.innerHTML = Math.round(100 * p) + '%'
+    // const el = document.getElementById('fetch-whisper-progress')!
+    // el.innerHTML = Math.round(100 * p) + '%'
   }
 
-  const cbCancel = function () {
-    let el
-
-    el = document.getElementById('fetch-whisper-tiny-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-en')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-tiny')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small')
-    if (el) el.style.display = 'inline-block'
-
-    el = document.getElementById('fetch-whisper-tiny-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-tiny-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-base-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-en-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-small-q5_1')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-medium-en-q5_0')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-medium-q5_0')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('fetch-whisper-large-q5_0')
-    if (el) el.style.display = 'inline-block'
-
-    el = document.getElementById('whisper-file')
-    if (el) el.style.display = 'inline-block'
-    el = document.getElementById('model-whisper-status')
-    if (el) el.innerHTML = ''
-  }
+  const cbCancel = function () {}
 
   loadRemote(url, dst, size_mb, cbProgress, storeFS, cbCancel, printTextarea)
 }
@@ -352,7 +318,7 @@ export function loadWhisper(model: string) {
 //
 
 // const kMaxAudio_s = 30 * 60;
-const kMaxRecording_s = 60 * 60
+const kMaxRecording_s = 60 * 60 // 60 min
 const kSampleRate = 16000
 
 // @ts-expect-error:
@@ -371,19 +337,12 @@ export function stopRecording() {
 // record up to kMaxRecording_s seconds of audio from the microphone
 // check if doRecording is false every 1000 ms and stop recording if so
 // update progress information
-export function startRecording() {
+export function startRecording(cbAudioReady: () => void) {
   if (!context) {
     context = new AudioContext({
       sampleRate: kSampleRate,
     })
   }
-
-  ;(document.getElementById('start') as HTMLButtonElement).disabled = true
-  ;(document.getElementById('stop') as HTMLButtonElement).disabled = false
-
-  document.getElementById('progress-bar')!.style.width = '0%'
-  document.getElementById('progress-text')!.innerHTML = '0%'
-
   doRecording = true
   startTime = Date.now()
 
@@ -401,11 +360,10 @@ export function startRecording() {
       mediaRecorder.onstop = function (e) {
         const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
         chunks = []
-        ;(document.getElementById('start') as HTMLButtonElement).disabled = false
-        ;(document.getElementById('stop') as HTMLButtonElement).disabled = true
+        console.log('ON STOP - MAYBE CALLBACK TO CALLER?')
 
         const reader = new FileReader()
-        reader.onload = function (event) {
+        reader.onload = function (_event) {
           const buf = new Uint8Array(reader.result)
 
           context!.decodeAudioData(
@@ -423,17 +381,18 @@ export function startRecording() {
 
               offlineContext.startRendering().then(function (renderedBuffer) {
                 audio = renderedBuffer.getChannelData(0)
-                printTextarea('js: audio recorded, size: ' + audio.length)
+                printTextarea('audio recorded, size: ' + audio.length)
+                cbAudioReady()
 
                 // // truncate to first 30 seconds
                 // if (audio.length > kMaxRecording_s * kSampleRate) {
                 //   audio = audio.slice(0, kMaxRecording_s * kSampleRate)
-                //   printTextarea('js: truncated audio to first ' + kMaxRecording_s + ' seconds')
+                //   printTextarea('truncated audio to first ' + kMaxRecording_s + ' seconds')
                 // }
               })
             },
             function (e) {
-              printTextarea('js: error decoding audio: ' + e)
+              printTextarea('error decoding audio: ' + e)
               audio = null
             }
           )
@@ -444,7 +403,7 @@ export function startRecording() {
       mediaRecorder.start()
     })
     .catch(function (err) {
-      printTextarea('js: error getting audio stream: ' + err)
+      printTextarea('error getting audio stream: ' + err)
     })
 
   var interval = setInterval(function () {
@@ -455,18 +414,17 @@ export function startRecording() {
         track.stop()
       })
     }
-
-    document.getElementById('progress-bar')!.style.width =
-      (100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
-    document.getElementById('progress-text')!.innerHTML =
-      ((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
+    // document.getElementById('progress-bar')!.style.width =
+    //   (100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s + '%'
+    // document.getElementById('progress-text')!.innerHTML =
+    //   ((100 * (Date.now() - startTime)) / 1000 / kMaxRecording_s).toFixed(0) + '%'
   }, 1000)
 
-  printTextarea('js: recording ...')
+  printTextarea('recording ...')
 
   setTimeout(function () {
     if (doRecording) {
-      printTextarea('js: recording stopped after ' + kMaxRecording_s + ' seconds')
+      printTextarea('recording stopped after ' + kMaxRecording_s + ' seconds')
       stopRecording()
     }
   }, kMaxRecording_s * 1000)
@@ -478,44 +436,40 @@ export function startRecording() {
 
 const nthreads = 8
 
-export function onProcess(translate: boolean) {
+export function onProcess(translate: boolean = false) {
   if (!instance) {
     // @ts-expect-error:
     instance = window.Module.init('whisper.bin')
 
     if (instance) {
-      printTextarea('js: whisper initialized, instance: ' + instance)
-      document.getElementById('model')!.innerHTML = 'Model loaded: ' + model_whisper
+      printTextarea('whisper initialized, instance: ' + instance)
+      // document.getElementById('model')!.innerHTML = 'Model loaded: ' + model_whisper
+      printTextarea('Model loaded: ' + model_whisper)
     }
   }
 
   if (!instance) {
-    printTextarea('js: failed to initialize whisper')
+    printTextarea('failed to initialize whisper')
     return
   }
 
   if (!audio) {
-    printTextarea('js: no audio data')
+    printTextarea('no audio data')
     return
   }
 
-  if (instance) {
-    printTextarea('')
-    printTextarea('js: processing - this might take a while ...')
-    printTextarea('')
+  printTextarea('processing - this might take a while ...')
 
-    setTimeout(function () {
-      const ret = window.Module.full_default(
-        instance,
-        audio,
-        document.getElementById('language')!.value,
-        nthreads,
-        translate
-      )
-      console.log('js: full_default returned: ' + ret)
-      if (ret) {
-        printTextarea('js: whisper returned: ' + ret)
-      }
-    }, 100)
-  }
+  setTimeout(function () {
+    const ret = window.Module.full_default(
+      instance,
+      audio,
+      document.getElementById('language')!.value,
+      nthreads,
+      translate
+    )
+    if (ret && ret.trim().length > 0) {
+      printTextarea('[full_default] ' + ret)
+    }
+  }, 100)
 }
