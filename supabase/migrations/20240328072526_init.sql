@@ -7,6 +7,7 @@ create table qset (  -- question set
   created_at timestamp(6) without time zone not null default now()
 );
 
+-- follow up questions -  not part of qset, hmmmm
 create table questions (
   id uuid not null default uuid_generate_v4() primary key,
   content text not null,
