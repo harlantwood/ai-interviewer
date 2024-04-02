@@ -1,12 +1,12 @@
 User
-- has many QuestionGroups
+- has many QSets
 
-QuestionGroup
+QSet (Question Set)
 - has many Questions
 
 Interview
 - has one User
-- has one QuestionGroup
+- has one QSet
 
 Question
 - has many Answers through QuestionAnswerJoins
