@@ -345,10 +345,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mlc-ai/web-llm@^0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@mlc-ai/web-llm/-/web-llm-0.2.14.tgz#a52fa1615548136877518b92259b0f35f36f920a"
-  integrity sha512-6xGBPwGX97p1n0MEOuybOk7sPT4/BDNpMXRgiTcR+QLhzGftq8Ko6diN11GKAclyfUD3B/VQZYM3beSrvevhxw==
+"@mlc-ai/web-llm@^0.2.29":
+  version "0.2.29"
+  resolved "https://registry.yarnpkg.com/@mlc-ai/web-llm/-/web-llm-0.2.29.tgz#53f51fc63d6a345a77ae611c20cb9a8a08c7a916"
+  integrity sha512-7SA1g0tcJFainLfpW+THXPgStYnx3DUJTFNQkhjI+Clh678Bp06mQgGkL2ZxIonfXLW/Z2lThAqNB4NX1cgUKw==
 
 "@neoconfetti/svelte@^1.0.0":
   version "1.0.0"
