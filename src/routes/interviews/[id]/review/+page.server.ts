@@ -34,14 +34,40 @@ export async function load({ params }) {
   //   content
   // )
 
-  data = result.data;
+  let interview = result.data;
   error = result.error;
   if (error) throw errorBall(500, error.message);
 
   console.log({ data });
-  console.log('questions: ', data.questions)
-  console.log('answers: ', data.answers)
+
+
+  result = await supabase
+    .from("question_answer_joins")
+    .select(
+      `
+        question_id,
+        answer_id,
+        position
+      `
+    )
+    .eq('interview_id', interviewId)
+  // questions (
+  //   id,
+  //   content
+  // ),
+  // answers (
+  //   id,
+  //   content
+  // )
+
+  const qa = result.data;
+  error = result.error;
+  if (error) throw errorBall(500, error.message);
+
+  console.log({ qa_joins: data });
+
+
   return {
-    data: data ?? {}
+    data: interview ?? {}
   };
 }
