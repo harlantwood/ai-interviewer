@@ -3,7 +3,7 @@ import { error as errorBall } from '@sveltejs/kit';
 
 export async function load({ params }) {
   const interviewId = params.id;
-  let data, error, result
+  let result, error
 
   // result = await supabase.from("auth.users").select()
   // data = result.data;
@@ -38,36 +38,55 @@ export async function load({ params }) {
   error = result.error;
   if (error) throw errorBall(500, error.message);
 
-  console.log({ data });
+  // console.log({ interview });
 
 
   result = await supabase
     .from("question_answer_joins")
     .select(
       `
-        question_id,
-        answer_id,
+        question_id (
+          id,
+          content
+        ),
+        answer_id (
+          content
+        ),
+        interview_id,
         position
       `
     )
     .eq('interview_id', interviewId)
-  // questions (
-  //   id,
-  //   content
-  // ),
-  // answers (
-  //   id,
-  //   content
-  // )
+    .order('position', { ascending: true })
 
-  const qa = result.data;
   error = result.error;
   if (error) throw errorBall(500, error.message);
 
-  console.log({ qa_joins: data });
+  let qa = result.data;
+  console.log(JSON.stringify({ qa }, null, 2));
+
+  // Group by question_id
+  qa = qa.reduce((acc, item) => {
+    const key = item.question_id.id;
+    console.log({ key });
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  error = result.error;
+  if (error) throw errorBall(500, error.message);
+
+  console.log(JSON.stringify({ qa }, null, 2));
 
 
+  const data = {
+    interview,
+    qa
+  }
   return {
-    data: interview ?? {}
+    data: data ?? {}
   };
 }

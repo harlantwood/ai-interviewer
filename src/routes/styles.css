@@ -109,3 +109,10 @@ button:focus:not(:focus-visible) {
   width: 1px;
   white-space: nowrap;
 }
+
+div.qa {
+  margin-bottom: 1rem;
+}
+div.question {
+  font-weight: bold;
+}
