@@ -1,5 +1,5 @@
 create table qset (  -- question set
-  id uuid not null default uuid_generate_v4() primary key,
+  id char(44) not null primary key,
   name character varying,
 
   user_id uuid references auth.users not null,
@@ -9,7 +9,7 @@ create table qset (  -- question set
 
 -- follow up questions -  not part of qset, hmmmm
 create table questions (
-  id uuid not null default uuid_generate_v4() primary key,
+  id char(44) not null primary key,
   content text not null,
 
   user_id uuid references auth.users not null,
@@ -18,8 +18,8 @@ create table questions (
 );
 
 create table qset_question_joins ( -- a question can be in multiple qsets
-  qset_id uuid references qset not null,
-  question_id uuid references questions not null,
+  qset_id char(44) references qset not null,
+  question_id char(44) references questions not null,
   position double precision not null,
 
   primary key (qset_id, question_id),
@@ -28,7 +28,7 @@ create table qset_question_joins ( -- a question can be in multiple qsets
 );
 
 create table interviewer (  -- an intervier persona, eg Terry Gross, not a user
-  id uuid not null default uuid_generate_v4() primary key,
+  id char(44) not null primary key,
   name character varying,
   description text,
 
@@ -38,18 +38,18 @@ create table interviewer (  -- an intervier persona, eg Terry Gross, not a user
 );
 
 create table interviews (
-  id uuid not null default uuid_generate_v4() primary key,
+  id char(44) not null primary key,
   name character varying,
   description text,
 
   subject_id uuid references auth.users not null,
-  interviewer_id uuid references interviewer not null,
+  interviewer_id char(44) references interviewer not null,
 
   created_at timestamp(6) without time zone not null default now()
 );
 
 create table answers (
-  id uuid not null default uuid_generate_v4() primary key,
+  id char(44) not null primary key,
   content text not null,
 
   user_id uuid references auth.users not null,
@@ -58,9 +58,9 @@ create table answers (
 );
 
 create table question_answer_joins (
-  question_id uuid references questions not null,
-  answer_id uuid references answers not null,
-  interview_id uuid references interviews not null,
+  question_id char(44) references questions not null,
+  answer_id char(44) references answers not null,
+  interview_id char(44) references interviews not null,
 
   position double precision not null,
 
