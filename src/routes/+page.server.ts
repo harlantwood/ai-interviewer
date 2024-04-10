@@ -1,7 +1,16 @@
-export function load({ setHeaders }) {
-  setHeaders({
-    // Need these headers to enable SharedArrayBuffer, see: https://web.dev/articles/cross-origin-isolation-guide
-    'Cross-Origin-Opener-Policy': 'same-origin',
-    'Cross-Origin-Embedder-Policy': 'require-corp',
-  })
+import { supabase } from "$lib/supabaseClient";
+import { error as errorBall } from '@sveltejs/kit';
+
+export async function load({ }) {
+  let result, error
+
+  result = await supabase.from("interviews").select(
+  )
+
+  let interviews = result.data as unknown[];
+  error = result.error;
+  if (error) throw errorBall(500, error.message);
+
+  const data = {interviews}
+  return data ;
 }
