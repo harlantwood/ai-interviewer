@@ -1,22 +1,25 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { speakQuestion } from '$lib/tts/openai'
 
   export let data
   let interview = data.interview!
   let question: number | null = null
   let recording: 'on' | 'paused' | 'off' = 'off'
 
-  $: console.log(JSON.stringify(interview, null, 2))
+  // $: console.log(JSON.stringify(interview, null, 2))
   $: console.log({ question })
 
-  function start() {
-    console.log('start interview')
-    question = 0
+  function setQuestion(_question: number) {
+    question = _question
+    if (question != null) {
+      const questionText = interview.script_questions[question].interview_questions[0].content
+      speakQuestion(questionText, questionAudioEnded)
+    }
   }
 
-  function pause() {
-    console.log('pause interview')
-    recording = 'paused'
+  function questionAudioEnded() {
+    recording = 'on'
   }
 </script>
 
@@ -24,7 +27,7 @@
 
 {#if question == null}
   <div class="description">{interview.description}</div>
-  <button on:click={start}>Start Interview</button>
+  <button on:click={() => setQuestion(0)}>Start Interview</button>
 {:else if question < interview.script_questions.length - 1}
   <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
   <hr />
@@ -41,7 +44,7 @@
     <button on:click={() => (recording = 'on')}>Resume</button>
   {/if}
   <hr />
-  <button on:click={() => question != null && question++}>Next</button>
+  <button on:click={() => setQuestion(question + 1)}>Next</button>
 {:else}
   <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
   <button on:click={() => goto('/')}>Finish</button>
