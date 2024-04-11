@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { speakQuestion } from '$lib/tts/openai'
+  import Recording from './Recording.svelte'
 
   export let data
   let interview = data.interview!
@@ -31,21 +32,13 @@
 {:else if question < interview.script_questions.length - 1}
   <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
   <hr />
-  <div class="recording">
-    {#if recording == 'on'}
-      Recording...
-    {:else if recording == 'paused'}
-      Recording paused
-    {/if}
-  </div>
-  {#if recording == 'on'}
-    <button on:click={() => (recording = 'paused')}>Pause</button>
-  {:else if recording == 'paused'}
-    <button on:click={() => (recording = 'on')}>Resume</button>
-  {/if}
+  <Recording {recording} />
   <hr />
-  <button on:click={() => setQuestion(question + 1)}>Next</button>
+  <button on:click={() => question != null && setQuestion(question + 1)}>Next</button>
 {:else}
   <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
+  <hr />
+  <Recording {recording} />
+  <hr />
   <button on:click={() => goto('/')}>Finish</button>
 {/if}
