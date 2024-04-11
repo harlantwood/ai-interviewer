@@ -31,6 +31,10 @@
   <button on:click={() => setQuestion(0)}>Start Interview</button>
 {:else if question < interview.script_questions.length - 1}
   <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
+  <div class="progress">
+    ({question + 1}
+    / {interview.script_questions.length})
+  </div>
   <hr />
   <Recording {recording} />
   <hr />
