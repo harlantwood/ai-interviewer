@@ -10,7 +10,7 @@
   {/if}
 </div>
 {#if recording == 'on'}
-  <button class="btn btn-primary" on:click={() => (recording = 'paused')}>Pause</button>
+  <button class="btn btn-outline px-16" on:click={() => (recording = 'paused')}>Pause</button>
 {:else if recording == 'paused'}
-  <button class="btn btn-primary" on:click={() => (recording = 'on')}>Resume</button>
+  <button class="btn btn-outline px-16" on:click={() => (recording = 'on')}>Resume</button>
 {/if}

@@ -4,19 +4,21 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [require('daisyui')],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daisyui: {
-    themes: ["dark"],
-    // themes:
-    // "light",
-    // "dark",
-    // "cupcake",
+    themes:
+    [
+      "dark",
+      // "light",
+      // "corporate",
+      // "night",
+      // "cupcake",
+      // "cyberpunk",
+      // "sunset",
     // "bumblebee",
     // "emerald",
-    // "corporate",
     // "synthwave",
     // "retro",
-    // "cyberpunk",
     // "valentine",
     // "halloween",
     // "garden",
@@ -34,12 +36,10 @@ export default {
     // "business",
     // "acid",
     // "lemonade",
-    // "night",
     // "coffee",
     // "winter",
     // "dim",
     // "nord",
-    // "sunset",
-
+    ]
   },
 }

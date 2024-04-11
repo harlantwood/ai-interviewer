@@ -28,23 +28,24 @@
 
 {#if question == null}
   <div>{interview.description}</div>
-  <button class="btn btn-primary" on:click={() => setQuestion(0)}>Start Interview</button>
+  <button class="btn btn-primary px-16" on:click={() => setQuestion(0)}>Start Interview</button>
 {:else if question < interview.script_questions.length - 1}
   <div>{interview.script_questions[question].interview_questions[0].content}</div>
   <div>
     ({question + 1}
     / {interview.script_questions.length})
   </div>
-  <!-- <hr /> -->
+  <br />
   <Recording {recording} />
-  <!-- <hr /> -->
-  <button class="btn btn-primary" on:click={() => question != null && setQuestion(question + 1)}
-    >Next</button
+  <br />
+  <button
+    class="btn btn-primary px-16"
+    on:click={() => question != null && setQuestion(question + 1)}>Next</button
   >
 {:else}
   <div>{interview.script_questions[question].interview_questions[0].content}</div>
-  <!-- <hr /> -->
+  <br />
   <Recording {recording} />
-  <!-- <hr /> -->
-  <button class="btn btn-primary" on:click={() => goto('/')}>Finish</button>
+  <br />
+  <button class="btn btn-primary px-16" on:click={() => goto('/')}>Finish</button>
 {/if}
