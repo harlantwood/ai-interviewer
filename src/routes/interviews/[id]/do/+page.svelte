@@ -27,22 +27,24 @@
 <h1>{interview.name}</h1>
 
 {#if question == null}
-  <div class="description">{interview.description}</div>
-  <button on:click={() => setQuestion(0)}>Start Interview</button>
+  <div>{interview.description}</div>
+  <button class="btn btn-primary" on:click={() => setQuestion(0)}>Start Interview</button>
 {:else if question < interview.script_questions.length - 1}
-  <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
-  <div class="progress">
+  <div>{interview.script_questions[question].interview_questions[0].content}</div>
+  <div>
     ({question + 1}
     / {interview.script_questions.length})
   </div>
-  <hr />
+  <!-- <hr /> -->
   <Recording {recording} />
-  <hr />
-  <button on:click={() => question != null && setQuestion(question + 1)}>Next</button>
+  <!-- <hr /> -->
+  <button class="btn btn-primary" on:click={() => question != null && setQuestion(question + 1)}
+    >Next</button
+  >
 {:else}
-  <div class="question">{interview.script_questions[question].interview_questions[0].content}</div>
-  <hr />
+  <div>{interview.script_questions[question].interview_questions[0].content}</div>
+  <!-- <hr /> -->
   <Recording {recording} />
-  <hr />
-  <button on:click={() => goto('/')}>Finish</button>
+  <!-- <hr /> -->
+  <button class="btn btn-primary" on:click={() => goto('/')}>Finish</button>
 {/if}

@@ -2,7 +2,7 @@
   export let recording: 'on' | 'paused' | 'off'
 </script>
 
-<div class="recording">
+<div class="">
   {#if recording == 'on'}
     Recording...
   {:else if recording == 'paused'}
@@ -10,7 +10,7 @@
   {/if}
 </div>
 {#if recording == 'on'}
-  <button on:click={() => (recording = 'paused')}>Pause</button>
+  <button class="btn btn-primary" on:click={() => (recording = 'paused')}>Pause</button>
 {:else if recording == 'paused'}
-  <button on:click={() => (recording = 'on')}>Resume</button>
+  <button class="btn btn-primary" on:click={() => (recording = 'on')}>Resume</button>
 {/if}
