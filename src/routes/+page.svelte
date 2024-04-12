@@ -5,7 +5,7 @@
 
   // import WhisperLoadModel from '../components/whisper/WhisperLoadModel.svelte'
 
-  let dev = true // dev mode shortcuts
+  let dev = false // dev mode shortcuts
 
   let chat //: ChatModule
 
@@ -67,24 +67,11 @@
     //   new Worker('/public/webllm/worker.js', { type: 'module' })
     // )
     // main thread (working, but worse):
-    chat = new webllm.ChatModule()
 
-    chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
+    const initProgressCallback = (report: webllm.InitProgressReport) => {
       console.log('[webllm]', report.text)
-    })
-    if (!dev) {
-      reloadLlm()
     }
-  }
-
-  function save() {
-    reloadLlm()
-  }
-
-  async function reloadLlm() {
-    // const appConfig = {
-    //   model_list: MODEL_LIST,
-    // }
+    const selectedModel = 'Llama-2-7b-chat-hf-q4f32_1'
     const chatOpts = {
       // repetition_penalty: 1.01,
       conv_config: {
@@ -92,14 +79,49 @@
       },
     }
 
-    // aspirational, not working yet:
-    // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
-    // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
-    // good:
-    await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
-    // fast but crazy bad ;)
-    // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
+    const engine: webllm.EngineInterface = await webllm.CreateEngine(
+      selectedModel,
+      /*engineConfig=*/ {
+        chatOpts,
+        initProgressCallback,
+      }
+    )
+
+    chat = engine.chat
+
+    // chat = new webllm.ChatModule()
+
+    // chat.setInitProgressCallback((report: webllm.InitProgressReport) => {
+    //   console.log('[webllm]', report.text)
+    // })
+    // if (!dev) {
+    //   reloadLlm()
+    // }
   }
+
+  // function save() {
+  //   reloadLlm()
+  // }
+
+  // async function reloadLlm() {
+  //   // const appConfig = {
+  //   //   model_list: MODEL_LIST,
+  //   // }
+  //   const chatOpts = {
+  //     // repetition_penalty: 1.01,
+  //     conv_config: {
+  //       system: systemPrompt(),
+  //     },
+  //   }
+
+  //   // aspirational, not working yet:
+  //   // await chat.reload('Mistral-7B-Instruct-v0.2-q4f16_1', chatOpts, appConfig)
+  //   // await chat.reload('NeuralHermes-2.5-Mistral-7B-q4f16_1')
+  //   // good:
+  //   await chat.reload('Llama-2-7b-chat-hf-q4f32_1', chatOpts)
+  //   // fast but crazy bad ;)
+  //   // await chat.reload('RedPajama-INCITE-Chat-3B-v1-q4f32_1', chatOpts)
+  // }
 
   async function initWhisper() {
     const whisper = await import('$lib/vendor/whisper/helpers')
@@ -163,9 +185,17 @@
       question = topicList[Math.floor(Math.random() * topicList.length)]
       currentQuestion = question
     } else {
-      question = await chat.generate(lastAnswer, onChatGenerate)
+      const response = await chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt() },
+          { role: 'user', content: 'Ask me a question :)' },
+          // {role: 'user', content: lastAnswer},
+        ],
+      })
+      console.log('response obj', response)
+      question = response.choices[0].message.content
+      console.log('question', question)
     }
-    console.log('question', question)
     // console.log('stats', await chat.runtimeStatsText())
     return question
   }
@@ -185,7 +215,7 @@
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
     audio.onended = function () {
-      beginAnswerTurn()
+      // beginAnswerTurn()
     }
     await audio.play() //.catch((e) => console.error('Error playing audio:', e))
     // return audio
@@ -286,7 +316,7 @@ Voice:<select bind:value={interviewerVoice}>
 
 <textarea bind:value={interviewerInstructions} rows={5} cols={80} />
 
-<button on:click={save}>Save</button>
+<!-- <button on:click={save}>Save</button> -->
 
 <hr />
 <button on:click={beginInterview}>Start Interview</button>
