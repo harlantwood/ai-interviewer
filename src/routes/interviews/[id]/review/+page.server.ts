@@ -1,8 +1,8 @@
-import { supabase } from "$lib/supabaseClient";
-import { error as errorBall } from '@sveltejs/kit';
+import { supabase } from '$lib/supabaseClient'
+import { error as errorBall } from '@sveltejs/kit'
 
 export async function load({ params }) {
-  const interviewId = params.id;
+  const interviewId = params.id
   let result, error
 
   // result = await supabase.from("auth.users").select()
@@ -11,8 +11,10 @@ export async function load({ params }) {
   // if (error) throw errorBall(500, error.message);
   // console.log({ users: data });
 
-  result = await supabase.from("interviews").select(
-    `
+  result = await supabase
+    .from('interviews')
+    .select(
+      `
       id,
       name,
       description,
@@ -36,18 +38,18 @@ export async function load({ params }) {
       )
 
     `
-  )
+    )
     .eq('id', interviewId)
-    .single();
+    .single()
 
-  let interview = result.data;
-  error = result.error;
-  if (error) throw errorBall(500, error.message);
+  const interview = result.data
+  error = result.error
+  if (error) throw errorBall(500, error.message)
 
   const data = {
     interview,
   }
   return {
-    data: data ?? {}
-  };
+    data: data ?? {},
+  }
 }

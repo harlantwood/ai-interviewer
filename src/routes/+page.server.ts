@@ -1,16 +1,15 @@
-import { supabase } from "$lib/supabaseClient";
-import { error as errorBall } from '@sveltejs/kit';
+import { supabase } from '$lib/supabaseClient'
+import { error as errorBall } from '@sveltejs/kit'
 
-export async function load({ }) {
+export async function load({}) {
   let result, error
 
-  result = await supabase.from("interviews").select(
-  )
+  result = await supabase.from('interviews').select()
 
-  let interviews = result.data as unknown[];
-  error = result.error;
-  if (error) throw errorBall(500, error.message);
+  const interviews = result.data as unknown[]
+  error = result.error
+  if (error) throw errorBall(500, error.message)
 
-  const data = {interviews}
-  return data ;
+  const data = { interviews }
+  return data
 }
