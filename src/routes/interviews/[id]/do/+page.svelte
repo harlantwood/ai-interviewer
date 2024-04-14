@@ -29,7 +29,6 @@
 
   function setRecordingState(state: RecordingState) {
     if (state === 'recording') {
-      console.log('in state===recording')
       speechToText(transcriptChunks, {
         service: 'deepgram',
         apiKey: PUBLIC_DEEPGRAM_API_KEY,
