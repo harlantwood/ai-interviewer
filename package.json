@@ -24,6 +24,7 @@
     "@deepgram/sdk": "^3.2.0",
     "@supabase/supabase-js": "^2.39.1",
     "buffer": "^6.0.3",
+    "@convo/convo": "link:../convo",
     "openai": "^4.24.1"
   },
   "devDependencies": {

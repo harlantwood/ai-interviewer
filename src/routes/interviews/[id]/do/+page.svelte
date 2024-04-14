@@ -1,15 +1,19 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { speakQuestion } from '$lib/tts/openai'
+  import { speechToText } from '@convo/convo'
   import Recording from './Recording.svelte'
+  import { PUBLIC_DEEPGRAM_API_KEY } from '$env/static/public'
 
   export let data
   let interview = data.interview!
   let question: number | null = null
-  let recording: 'on' | 'paused' | 'off' = 'off'
+  let recordingState: RecordingState = 'inactive'
+  let transcriptChunks: string[] = []
 
   // $: console.log(JSON.stringify(interview, null, 2))
-  $: console.log({ question })
+  // $: console.log({ question })
+  $: transcriptChunks && console.log({ transcriptChunks })
 
   function setQuestion(_question: number) {
     question = _question
@@ -20,7 +24,31 @@
   }
 
   function questionAudioEnded() {
-    recording = 'on'
+    setRecordingState('recording')
+  }
+
+  function setRecordingState(state: RecordingState) {
+    if (state === 'recording') {
+      console.log('in state===recording')
+      speechToText(transcriptChunks, {
+        service: 'deepgram',
+        apiKey: PUBLIC_DEEPGRAM_API_KEY,
+        onConnect: () => {
+          console.log('Connected')
+        },
+        onEnd: () => {
+          console.log('Transcript ended')
+        },
+        onError: (error) => {
+          console.error({ error })
+        },
+      })
+    } else if (state === 'paused') {
+      // TODO Pause recording
+    } else if (state === 'inactive') {
+      // TODO  Stop recording
+    }
+    recordingState = state
   }
 </script>
 
@@ -36,16 +64,18 @@
     / {interview.script_questions.length})
   </div>
   <br />
-  <Recording {recording} />
+  <Recording {recordingState} {setRecordingState} />
   <br />
   <button
     class="btn btn-primary px-16"
-    on:click={() => question != null && setQuestion(question + 1)}>Next</button
+    on:click={() =>
+      question != null && setQuestion(question + 1) && console.log({ transcriptChunks })}
+    >Next</button
   >
 {:else}
   <div>{interview.script_questions[question].interview_questions[0].content}</div>
   <br />
-  <Recording {recording} />
+  <Recording {recordingState} />
   <br />
   <button class="btn btn-primary px-16" on:click={() => goto('/')}>Finish</button>
 {/if}
