@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { speakQuestion } from '$lib/tts/openai'
-  import { speechToText } from '@convo/convo'
+  import { speechToText } from 'ai-convo'
   import Recording from './Recording.svelte'
   import { PUBLIC_DEEPGRAM_API_KEY } from '$env/static/public'
 
@@ -13,7 +13,6 @@
 
   // $: console.log(JSON.stringify(interview, null, 2))
   // $: console.log({ question })
-  $: transcriptChunks && console.log({ transcriptChunks })
 
   function setQuestion(_question: number) {
     question = _question
