@@ -22,11 +22,8 @@
     "test:unit": "vitest"
   },
   "dependencies": {
-    "ai-convo": "link:../ai-convo",
-    "@deepgram/sdk": "^3.2.0",
     "@supabase/supabase-js": "^2.39.1",
-    "buffer": "^6.0.3",
-    "openai": "^4.24.1"
+    "ai-convo": "link:../ai-convo"
   },
   "devDependencies": {
     "@fontsource/fira-mono": "^4.5.10",
