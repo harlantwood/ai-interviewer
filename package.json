@@ -1,5 +1,5 @@
 {
-  "name": "svelte-kit-suprabase",
+  "name": "intraviewer",
   "version": "0.0.1",
   "license": "Apache-2.0",
   "type": "module",
@@ -10,6 +10,8 @@
     "checks:strict": "yarn checks && tsc --noEmit",
     "checks:watch": "reset && nodemon --watch . --watch .env --watch .env.local --ext ts,svelte,json,js --ignore .svelte-kit --exec 'yarn checks'",
     "committed": "git diff --exit-code",
+    "deploy": "vercel deploy",
+    "deploy:prod": "vercel deploy --prod",
     "dev": "nodemon --watch .env --watch .env.local --watch package.json --watch svelte.config.js --watch tsconfig.json --watch yarn.lock --exec 'yarn dev:metal'",
     "dev:hammer": "nodemon --watch . --watch .env --watch .env.local --ext ts,svelte,json,js --ignore .svelte-kit --exec 'yarn dev:metal'",
     "dev:metal": "clear && reset && export PORT=${PORT:-8888} && vite dev --port ${PORT} --host --clearScreen",
@@ -39,6 +41,7 @@
     "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-cloudflare": "^3.0.1",
+    "@sveltejs/adapter-vercel": "^5.3.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/typography": "^0.5.12",
@@ -60,6 +63,7 @@
     "tailwindcss": "^3.4.3",
     "tslib": "^2.4.1",
     "typescript": "^5.0.0",
+    "vercel": "^34.1.7",
     "vite": "^5.0.3",
     "vitest": "^1.0.0"
   },
