@@ -14,18 +14,29 @@ module.exports = {
     ecmaVersion: 2020,
     extraFileExtensions: ['.svelte'],
   },
-  env: {
-    browser: true,
-    es2017: true,
-    node: true,
-  },
   overrides: [
     {
       files: ['*.svelte'],
       parser: 'svelte-eslint-parser',
       parserOptions: {
-        parser: '@typescript-eslint/parser',
+        parser: {
+          // Specify a parser for each lang.
+          ts: '@typescript-eslint/parser',
+          js: 'espree',
+          typescript: '@typescript-eslint/parser',
+        },
       },
     },
   ],
+  env: {
+    browser: true,
+    es2017: true,
+    node: true,
+  },
+  rules: {
+    'no-undef': 'off',
+    // no-undef has been turned off because of this:
+    // basically, it causes issues and TS does those checks so it's redundant
+    // https://typescript-eslint.io/linting/troubleshooting#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+  },
 }
