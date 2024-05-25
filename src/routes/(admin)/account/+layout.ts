@@ -1,6 +1,5 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
-import type { Database } from '../../../DatabaseDefinitions.js'
 import { redirect } from '@sveltejs/kit'
 
 export const load = async ({ fetch, data, depends, url }) => {
@@ -17,7 +16,7 @@ export const load = async ({ fetch, data, depends, url }) => {
     data: { session },
   } = await supabase.auth.getSession()
 
-  const profile: Database['public']['Tables']['profiles']['Row'] | null = data.profile
+  const profile = data.profile
 
   const createProfilePath = '/account/create_profile'
   if (profile && !_hasFullProfile(profile) && url.pathname !== createProfilePath) {
@@ -28,7 +27,7 @@ export const load = async ({ fetch, data, depends, url }) => {
 }
 
 export const _hasFullProfile = (
-  profile: Database['public']['Tables']['profiles']['Row'] | null
+  profile
 ) => {
   if (!profile) {
     return false

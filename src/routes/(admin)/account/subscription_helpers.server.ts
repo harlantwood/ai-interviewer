@@ -1,5 +1,4 @@
 import type { SupabaseClient, Session } from '@supabase/supabase-js'
-import type { Database } from '../../../DatabaseDefinitions'
 
 import { pricingPlans } from '../../(marketing)/pricing/pricing_plans'
 import { PRIVATE_STRIPE_API_KEY } from '$env/static/private'
@@ -10,7 +9,7 @@ export const getOrCreateCustomerId = async ({
   supabaseServiceRole,
   session,
 }: {
-  supabaseServiceRole: SupabaseClient<Database>
+  supabaseServiceRole: SupabaseClient
   session: Session
 }) => {
   const { data: dbCustomer, error } = await supabaseServiceRole
