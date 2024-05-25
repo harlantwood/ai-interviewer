@@ -1,0 +1,28 @@
+name: checks
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# env:
+#   OPENAI_API_KEY: 'xxxxxx'
+#   PUBLIC_DEEPGRAM_API_KEY: 'xxxxxx'
+#   PUBLIC_SUPABASE_PUBKEY_LOCAL: 'xxxxxx'
+
+jobs:
+  checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: 'package.json'
+      - run: yarn install --frozen-lockfile
+      - run: yarn checks
+      - run: yarn committed # ensure that checks did not modify files (eg formatting, linting, etc.)
