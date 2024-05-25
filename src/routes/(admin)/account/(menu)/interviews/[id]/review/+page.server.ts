@@ -1,7 +1,6 @@
-import { supabase } from '$lib/supabaseClient'
 import { error as errorBall } from '@sveltejs/kit'
 
-export async function load({ params }) {
+export async function load({ params, locals: { supabase } }) {
   const interviewId = params.id
   // result = await supabase.from("auth.users").select()
   // data = result.data;
