@@ -2,13 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
-
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     %sveltekit.head%
   </head>
-  <body data-sveltekit-preload-data="hover" class="p-8 prose lg:prose-xl">
+  <body
+    data-sveltekit-preload-data="hover"
+    style="min-height: 100vh; display: flex; flex-direction: column"
+  >
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

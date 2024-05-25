@@ -1,0 +1,8 @@
+.DS_Store
+.env.*
+.output
+.svelte-kit
+build
+package
+tmp
+node_modules

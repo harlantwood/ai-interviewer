@@ -1,4 +1,4 @@
-import {tts} from 'ai-convo'
+import { tts } from 'ai-convo'
 
 export async function speakQuestion(question: string, onAudioEnded: () => void) {
   const response = await fetch('/api/question/audio', {
@@ -11,5 +11,5 @@ export async function speakQuestion(question: string, onAudioEnded: () => void) 
     }),
   })
 
-  await tts.browser.playAudio({response, onAudioEnded})
+  await tts.browser.playAudio({ response, onAudioEnded })
 }
