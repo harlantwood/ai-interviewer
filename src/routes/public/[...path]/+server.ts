@@ -1,3 +1,5 @@
+import type { RequestHandler } from '@sveltejs/kit'
+
 export const GET = (async ({ fetch, url, params }) => {
   const response = await fetch(new URL(`/__public/${params.path}`, url.origin))
   const headers = new Headers(response.headers)

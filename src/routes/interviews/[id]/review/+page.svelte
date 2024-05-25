@@ -11,8 +11,8 @@
 <!-- <h2>Interviewee</h2> -->
 <!-- <p class="interviewee">{interview.subject?.email}</p> -->
 
-<h2>Interviewer</h2>
-<p class="interviewer">{interview.interviewer.name}</p>
+<!-- <h2>Interviewer</h2> -->
+<!-- <p class="interviewer">{interview.interviewer.name}</p> -->
 
 {#each interview.script_questions[0].interview_questions as question}
   <div class="qa">

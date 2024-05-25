@@ -1,13 +1,11 @@
 import { supabase } from '$lib/supabaseClient'
 import { error as errorBall } from '@sveltejs/kit'
 
-export async function load({}) {
-  let result, error
+export async function load() {
+  const result = await supabase.from('interviews').select()
 
-  result = await supabase.from('interviews').select()
-
-  const interviews = result.data as unknown[]
-  error = result.error
+  const interviews = result.data as Interview[]
+  const error = result.error
   if (error) throw errorBall(500, error.message)
 
   const data = { interviews }

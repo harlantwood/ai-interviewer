@@ -403,6 +403,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@mlc-ai/web-llm@^0.2.38":
+  version "0.2.38"
+  resolved "https://registry.yarnpkg.com/@mlc-ai/web-llm/-/web-llm-0.2.38.tgz#d4f3dcff1685e4e5b681ee5db3ef696ab580af96"
+  integrity sha512-evKnC12Vh/gAOWLzFLbrow7euEltDfb2oaFrnCHa8SMp0N9PYXaXujCgmuSuLBBuVuYjXeiA9jhu+X1C+ze9SA==
+
 "@neoconfetti/svelte@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@neoconfetti/svelte/-/svelte-1.0.0.tgz#84a7f98981ad546d959d8c99460da8cebdf70301"
@@ -910,9 +915,15 @@ agentkeepalive@^4.2.1:
   dependencies:
     humanize-ms "^1.2.1"
 
-"ai-convo@link:../ai-convo":
-  version "0.0.0"
-  uid ""
+ai-convo@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/ai-convo/-/ai-convo-0.0.9.tgz#04d552d40300313311d98dfa39a867cc9bc6df8f"
+  integrity sha512-C2BKoclVhtgyCXHMUWi7h0Z+OvCUfVZZP291JrVa4vYweY+FQ4RqKSFBybd+ih7ujhK/EIVgtU9Wvxm+XuykqQ==
+  dependencies:
+    "@deepgram/sdk" "^3.2.0"
+    buffer "^6.0.3"
+    openai "^4.24.1"
+    zod "^3.23.5"
 
 ajv@^6.12.4:
   version "6.12.6"

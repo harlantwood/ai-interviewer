@@ -3,15 +3,13 @@ import { error as errorBall } from '@sveltejs/kit'
 
 export async function load({ params }) {
   const interviewId = params.id
-  let result, error
-
   // result = await supabase.from("auth.users").select()
   // data = result.data;
   // error = result.error;
   // if (error) throw errorBall(500, error.message);
   // console.log({ users: data });
 
-  result = await supabase
+  const result = await supabase
     .from('interviews')
     .select(
       `
@@ -43,7 +41,7 @@ export async function load({ params }) {
     .single()
 
   const interview = result.data
-  error = result.error
+  const error = result.error
   if (error) throw errorBall(500, error.message)
 
   const data = {

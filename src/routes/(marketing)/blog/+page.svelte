@@ -16,9 +16,6 @@
     >
       {blogInfo.name}
     </div>
-    <a href="/blog/rss.xml" target="_blank" rel="noreferrer">
-      <img class="flex-none w-5 h-5 object-contain" src="/images/rss.svg" alt="rss feed" />
-    </a>
   </div>
   <div class="text-lg text-center">A demo blog with sample content.</div>
 

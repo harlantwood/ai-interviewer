@@ -9,6 +9,8 @@
 node_modules
 package-lock.json
 pnpm-lock.yaml
+src/lib/vendor/
+src/routes/dev/
 yarn.lock
 
 # negative ignores last

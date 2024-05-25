@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { speakQuestion } from '$lib/tts/openai'
-  import { speechToText } from 'ai-convo'
+  import { stt } from 'ai-convo'
   import Recording from './Recording.svelte'
   import { PUBLIC_DEEPGRAM_API_KEY } from '$env/static/public'
 
@@ -28,16 +28,21 @@
 
   function setRecordingState(state: RecordingState) {
     if (state === 'recording') {
-      speechToText(transcriptChunks, {
-        service: 'deepgram',
+      stt.browser.deepgram.transcribe({
         apiKey: PUBLIC_DEEPGRAM_API_KEY,
         onConnect: () => {
           console.log('Connected')
         },
+        onChunk: (chunk: string) => {
+          transcriptChunks.push(chunk)
+        },
         onEnd: () => {
           console.log('Transcript ended')
         },
-        onError: (error) => {
+        onWarn: (message: string) => {
+          console.warn('[deepgram][warning] ' + message)
+        },
+        onError: (error: unknown) => {
           console.error({ error })
         },
       })
@@ -64,16 +69,13 @@
   <br />
   <Recording {recordingState} {setRecordingState} />
   <br />
-  <button
-    class="btn btn-primary px-16"
-    on:click={() =>
-      question != null && setQuestion(question + 1) && console.log({ transcriptChunks })}
+  <button class="btn btn-primary px-16" on:click={() => question && setQuestion(question + 1)}
     >Next</button
   >
 {:else}
   <div>{interview.script_questions[question].interview_questions[0].content}</div>
   <br />
-  <Recording {recordingState} />
+  <Recording {recordingState} {setRecordingState} />
   <br />
   <button class="btn btn-primary px-16" on:click={() => goto('/')}>Finish</button>
 {/if}

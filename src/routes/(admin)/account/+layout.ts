@@ -26,7 +26,7 @@ export const load = async ({ fetch, data, depends, url }) => {
   return { supabase, session, profile }
 }
 
-export const _hasFullProfile = (profile) => {
+export const _hasFullProfile = (profile: Profile) => {
   if (!profile) {
     return false
   }
