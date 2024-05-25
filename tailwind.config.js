@@ -11,7 +11,7 @@ export default {
       // 'dark',
       // "light",
       // "corporate",
-      'night',
+      // 'night',
       // "cupcake",
       // "cyberpunk",
       // "sunset",
@@ -28,7 +28,7 @@ export default {
       // "pastel",
       // "fantasy",
       // "wireframe",
-      // "black",
+      "black", //
       // "luxury",
       // "dracula",
       // "cmyk",
